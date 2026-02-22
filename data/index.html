@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>AirSense: Trustable Smoke Detector</title>
@@ -19,7 +20,7 @@
             padding: 30px;
             background: #1e1e1e;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
@@ -107,7 +108,7 @@
         #dashboard {
             display: none;
         }
-        
+
         .alert-overlay {
             position: fixed;
             top: 0;
@@ -154,9 +155,9 @@
         .alert-box button:hover {
             background: #dc2626;
         }
-
     </style>
 </head>
+
 <body>
 
     <div class="container" id="signin">
@@ -169,7 +170,7 @@
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Enter WiFi password" required>
 
-    <div id="errorMessage" style="display:none; color:#ff5252; margin-top:10px;"></div>
+            <div id="errorMessage" style="display:none; color:#ff5252; margin-top:10px;"></div>
 
 
             <button type="submit">Connect Device →</button>
@@ -197,7 +198,7 @@
             <p id="breachText">No smoke breaches detected so far.</p>
             <button onclick="showBreachHistory()">View Breach History</button>
         </div>
-        
+
         <div class="section" id="breachHistory" style="display:none;">
             <h3>Breach History</h3>
             <ul id="breachList" style="color:#ccc;"></ul>
@@ -222,16 +223,16 @@
         let prevScore = null;
         const DEVIATION_LIMIT = 10;
 
-        document.getElementById('userID').addEventListener('submit', async function(e) {
+        document.getElementById('userID').addEventListener('submit', async function (e) {
             e.preventDefault();
             const ssid = document.getElementById('ssid').value;
             const pass = document.getElementById('password').value;
 
             try {
                 const response = await fetch('/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ssid, pass })
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ssid, pass })
                 });
 
                 const result = await response.json();
@@ -240,7 +241,7 @@
                     document.getElementById('signin').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
                 } else {
-                const errorMsg = document.getElementById('errorMessage');
+                    const errorMsg = document.getElementById('errorMessage');
                     errorMsg.textContent = "Wrong SSID or password — please try again.";
                     errorMsg.style.display = 'block';
 
@@ -260,13 +261,13 @@
                 const r = await fetch('/aqi');
                 const d = await r.json();
                 const s = parseFloat(d.score);
-                
+
                 const el = document.getElementById('score');
                 const st = document.getElementById('statusText');
                 el.textContent = s.toFixed(2);
 
                 let spikeAlert = false;
-                
+
                 if (prevScore !== null) {
                     spikeAlert = (s - prevScore) > DEVIATION_LIMIT;
                 }
@@ -320,7 +321,7 @@
                 li.textContent = entry;
                 list.appendChild(li);
             });
-            
+
             const historySection = document.getElementById('breachHistory');
 
             document.getElementById('breachHistory').style.display = 'block';
@@ -376,4 +377,5 @@
         load();
     </script>
 </body>
+
 </html>
