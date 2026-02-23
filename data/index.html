@@ -183,6 +183,27 @@
     <div class="container" id="signin">
       <h1>Kelompok 14 - Smoke Detector Prototype</h1>
       <h2>Connect your device to start monitoring</h2>
+
+    <!-- Connection Error Modal -->
+      <div id="connectionErrorModal" class="alert-overlay">
+        <div class="alert-box">
+          <h2>⚠️ No Connection Found</h2>
+          <p>Unable to connect to your device.<br/>Please check your WiFi settings and try again.</p>
+          <button onclick="closeConnectionError()">OK</button>
+        </div>
+      </div>
+
+      <!-- Success Modal -->
+      <div id="successModal" class="alert-overlay">
+        <div class="alert-box">
+          <h2 style='color:#10b981'>✓ Connected Successfully!</h2>
+          Your device is now connected.<br/>
+          Redirecting you shortly...
+          </p>
+          <!-- Auto-close handled by main flow -->
+        </div>
+      </div>
+
       <form id="userID">
         <label for="ssid">Username</label>
         <input
@@ -302,6 +323,7 @@
             }
           } catch (err) {
             console.error("Login request failed:", err);
+            showConnectionError();
           }
         });
 
@@ -382,6 +404,7 @@
         } catch (e) {
           // Device is offline
           document.getElementById("statusText").textContent = "ESP32 offline";
+          showConnectionError();
         }
       }
 
@@ -433,6 +456,22 @@
        */
       function acknowledgeAlert() {
         document.getElementById("alertOverlay").style.display = "none";
+        document.body.style.overflow = "auto";
+      }
+
+      /**
+       * Show connection error modal
+       */
+      function showConnectionError() {
+        document.getElementById("connectionErrorModal").style.display = "flex";
+        document.body.style.overflow = "hidden";
+      }
+
+      /**
+       * Close connection error modal
+       */
+      function closeConnectionError() {
+        document.getElementById("connectionErrorModal").style.display = "none";
         document.body.style.overflow = "auto";
       }
 
