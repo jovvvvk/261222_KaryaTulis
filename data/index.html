@@ -2,205 +2,699 @@
   Kelompok 14 - Smoke Detector Prototype - Web Interface
   
   Modern, responsive web dashboard for monitoring air quality and device status.
-  Features user authentication, real-time AQI updates, and device status monitoring.
+  Features user authentication, real-time AQI updates, emission charts, and mobile support.
+  
+  Technology Stack:
+  - Roboto font for modern typography
+  - Chart.js for emission history visualization
+  - Responsive CSS Grid and Flexbox
+  - Glassmorphism design pattern with backdrop filters
+  - Smooth animations and transitions
 -->
 <!doctype html>
 <html lang="en">
   <head>
     <!-- Page metadata -->
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Kelompok 14 - Smoke Detector Prototype with real-time monitoring"
+    />
     <title>Kelompok 14 - Smoke Detector Prototype</title>
+
+    <!-- Modern font - Roboto -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
     />
-    <!-- Style definitions for responsive dark-themed UI -->
+
+    <!-- Chart.js for emission history visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Responsive and modern styling -->
     <style>
-      body {
-        /* Dark theme background */
-        font-family: "Dancing Script", cursive;
-        background: #121212;
-        color: #e0e0e0;
+      * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        /* Modern color palette */
+        --primary-green: #10b981;
+        --success: #059669;
+        --warning-yellow: #f59e0b;
+        --danger-red: #ef4444;
+        --dark-red: #dc2626;
+        --background: #0f172a;
+        --surface: #1e293b;
+        --surface-light: #334155;
+        --text-primary: #f1f5f9;
+        --text-secondary: #cbd5e1;
+        --border: #475569;
+        --accent-orange: #f97316;
+        --accent-purple: #8b5cf6;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Roboto",
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: linear-gradient(135deg, var(--background) 0%, #1a2942 100%);
+        color: var(--text-primary);
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Login screen styling */
+      #signin {
+        width: 100%;
+        max-width: 450px;
+        margin: auto;
+        padding: 20px;
       }
 
       .container {
-        /* Main content container with max width */
-        max-width: 800px;
-        margin: 60px auto;
-        padding: 30px;
-        background: #1e1e1e;
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        padding: 32px 24px;
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(71, 85, 105, 0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        box-shadow:
+          0 10px 40px rgba(0, 0, 0, 0.4),
+          0 0 1px rgba(16, 185, 129, 0.1);
+        animation: slideInUp 0.5s ease-out;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       h1 {
-        /* Primary heading - green accent color */
         text-align: center;
-        color: #4caf50;
-        margin-bottom: 10px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-green) 0%,
+          var(--accent-orange) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 12px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
       }
 
       h2 {
         text-align: center;
-        font-weight: normal;
-        color: #aaa;
-        margin-bottom: 20px;
+        font-weight: 400;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+        font-size: 16px;
+        letter-spacing: 0.3px;
+      }
+
+      h3 {
+        color: var(--primary-green);
+        margin-bottom: 12px;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
       }
 
       label {
         display: block;
-        margin-top: 15px;
-        color: #ccc;
+        margin-top: 18px;
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
       }
 
       input {
-        /* Form input styling */
         width: 100%;
-        padding: 10px;
-        margin-top: 5px;
-        border: 1px solid #333;
-        border-radius: 6px;
-        background: #2a2a2a;
-        color: #e0e0e0;
+        padding: 12px 16px;
+        margin-top: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: rgba(51, 65, 85, 0.5);
+        color: var(--text-primary);
+        font-size: 15px;
+        font-family: "Roboto", sans-serif;
+        transition: all 0.3s ease;
+      }
+
+      input::placeholder {
+        color: rgba(203, 213, 225, 0.5);
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        background: rgba(51, 65, 85, 0.7);
+        box-shadow:
+          0 0 0 3px rgba(16, 185, 129, 0.1),
+          inset 0 2px 4px rgba(0, 0, 0, 0.2);
       }
 
       button {
-        /* Call-to-action button styling */
-        margin-top: 25px;
+        margin-top: 28px;
         width: 100%;
-        padding: 12px;
-        background: #4caf50;
+        padding: 14px 24px;
+        background: linear-gradient(
+          135deg,
+          var(--primary-green) 0%,
+          var(--success) 100%
+        );
         color: #fff;
         border: none;
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
       }
 
       button:hover {
-        background: #43a047;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
       }
 
-      header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-      }
-
-      header .status {
-        font-size: 14px;
-        color: #aaa;
-        text-align: right;
-      }
-
-      .section {
-        /* Dashboard content section styling */
-        margin-top: 20px;
-        padding: 20px;
-        background: #2a2a2a;
-        border-radius: 8px;
-      }
-
-      .section h3 {
-        color: #4caf50;
-        margin-bottom: 10px;
-      }
-
-      .aqi {
-        /* Air quality score display - large bold text */
-        font-size: 24px;
-        font-weight: bold;
-        color: #4caf50;
-      }
-
-      .breach {
-        font-size: 20px;
-        font-weight: bold;
-        color: #ff5252;
+      button:active {
+        transform: translateY(0);
       }
 
       #dashboard {
-        /* Hidden initially, shown after successful login */
         display: none;
+        width: 100%;
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
       }
 
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .dashboard-header h1 {
+        flex: 1;
+        min-width: 250px;
+        margin-bottom: 0;
+      }
+
+      .header-status {
+        display: flex;
+        gap: 32px;
+        flex-wrap: wrap;
+        padding: 16px 24px;
+        background: rgba(30, 41, 59, 0.5);
+        border-radius: 8px;
+        border: 1px solid rgba(71, 85, 105, 0.2);
+      }
+
+      .status-item {
+        text-align: right;
+        font-size: 13px;
+      }
+
+      .status-item .label {
+        color: var(--text-secondary);
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .status-item .value {
+        color: var(--primary-green);
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+      }
+
+      .section {
+        padding: 28px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(71, 85, 105, 0.2);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .section:hover {
+        border-color: rgba(16, 185, 129, 0.2);
+        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+      }
+
+      .metric-display {
+        text-align: center;
+        margin: 24px 0;
+      }
+
+      .aqi-score {
+        font-size: 56px;
+        font-weight: 700;
+        margin: 16px 0;
+        background: linear-gradient(
+          135deg,
+          var(--primary-green) 0%,
+          var(--accent-orange) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .emission-count {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 16px 0;
+      }
+
+      .status-text {
+        color: var(--text-secondary);
+        font-size: 14px;
+        line-height: 1.6;
+        margin-top: 12px;
+      }
+
+      .graph-container {
+        grid-column: 1 / -1;
+        padding: 28px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(71, 85, 105, 0.2);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+      }
+
+      .graph-container h3 {
+        margin-bottom: 20px;
+      }
+
+      #emissionChart {
+        max-height: 400px;
+        margin-bottom: 20px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .button-group button {
+        flex: 1;
+        min-width: 140px;
+        margin-top: 0;
+      }
+
+      .section button {
+        margin-top: 20px;
+      }
+
+      /* Modal overlays */
       .alert-overlay {
-        /* Full-screen modal for smoke detection alerts */
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.85);
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
         display: none;
         align-items: center;
         justify-content: center;
         z-index: 9999;
+        animation: fadeIn 0.3s ease-out;
       }
 
       .alert-box {
-        /* Modal alert box styling */
-        background: #1e1e1e;
-        padding: 30px;
-        border-radius: 12px;
+        background: rgba(30, 41, 59, 0.95);
+        padding: 40px;
+        border-radius: 16px;
         text-align: center;
-        max-width: 400px;
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+        max-width: 420px;
+        box-shadow:
+          0 20px 60px rgba(0, 0, 0, 0.6),
+          0 0 1px rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(71, 85, 105, 0.3);
+        animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      @keyframes slideInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
       }
 
       .alert-box h2 {
-        color: #ef4444;
-        margin-bottom: 10px;
+        color: var(--danger-red);
+        margin-bottom: 16px;
+        font-size: 24px;
+        margin-top: 0;
       }
 
       .alert-box p {
-        color: #ddd;
-        margin-bottom: 20px;
-        font-size: 16px;
+        color: var(--text-secondary);
+        margin-bottom: 28px;
+        font-size: 15px;
+        line-height: 1.6;
       }
 
       .alert-box button {
-        background: #ef4444;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
+        background: linear-gradient(
+          135deg,
+          var(--danger-red) 0%,
+          var(--dark-red) 100%
+        );
+        padding: 14px 32px;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
       }
 
       .alert-box button:hover {
-        background: #dc2626;
+        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+      }
+
+      #successModal h2 {
+        color: var(--primary-green);
+      }
+
+      #successModal button {
+        background: linear-gradient(
+          135deg,
+          var(--primary-green) 0%,
+          var(--success) 100%
+        );
+      }
+
+      #connectionErrorModal h2 {
+        color: var(--warning-yellow);
+      }
+
+      #connectionErrorModal button {
+        background: linear-gradient(
+          135deg,
+          var(--warning-yellow) 0%,
+          var(--accent-orange) 100%
+        );
+      }
+
+      /* Toast notification */
+      .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(30, 41, 59, 0.95);
+        color: var(--warning-yellow);
+        padding: 16px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 9998;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        border-left: 4px solid var(--warning-yellow);
+        border: 1px solid rgba(71, 85, 105, 0.3);
+        animation: slideInToast 0.4s ease-out;
+        max-width: 360px;
+      }
+
+      @keyframes slideInToast {
+        from {
+          opacity: 0;
+          transform: translateX(400px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes slideOutToast {
+        from {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateX(400px);
+        }
+      }
+
+      .toast.fade-out {
+        animation: slideOutToast 0.3s ease-in forwards;
+      }
+
+      /* Item list styling */
+      .item-list {
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 20px 0;
+      }
+
+      .item-list li {
+        padding: 12px;
+        margin: 8px 0;
+        background: rgba(51, 65, 85, 0.4);
+        border-left: 3px solid var(--primary-green);
+        border-radius: 4px;
+        font-size: 14px;
+        color: var(--text-secondary);
+        list-style: none;
+        transition: all 0.2s ease;
+      }
+
+      .item-list li:hover {
+        background: rgba(51, 65, 85, 0.6);
+        padding-left: 16px;
+      }
+
+      /* Responsive design for tablets and mobile */
+      @media (max-width: 768px) {
+        body {
+          padding: 16px;
+        }
+
+        .container {
+          padding: 24px 20px;
+        }
+
+        #dashboard {
+          padding: 16px;
+        }
+
+        .dashboard-header {
+          flex-direction: column;
+          margin-bottom: 24px;
+        }
+
+        .dashboard-header h1 {
+          font-size: 24px;
+        }
+
+        .header-status {
+          width: 100%;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+
+        .aqi-score {
+          font-size: 42px;
+        }
+
+        .emission-count {
+          font-size: 36px;
+        }
+
+        .alert-box {
+          padding: 32px 24px;
+          margin: 20px;
+          max-width: calc(100% - 40px);
+        }
+
+        .toast {
+          right: 16px;
+          left: 16px;
+          max-width: none;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+
+        .button-group button {
+          width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 24px;
+        }
+
+        .container {
+          padding: 20px 16px;
+          border-radius: 12px;
+        }
+
+        .section {
+          padding: 20px;
+        }
+
+        .aqi-score {
+          font-size: 36px;
+        }
+
+        .emission-count {
+          font-size: 32px;
+        }
+
+        label {
+          font-size: 13px;
+        }
+
+        input {
+          padding: 10px 12px;
+          font-size: 14px;
+        }
+
+        button {
+          padding: 12px 20px;
+          font-size: 15px;
+        }
+
+        .alert-box {
+          padding: 24px 20px;
+        }
+
+        .alert-box h2 {
+          font-size: 20px;
+        }
+
+        .alert-box p {
+          font-size: 14px;
+        }
+      }
+
+      /* Accessibility */
+      input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Loading spinner */
+      .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(203, 213, 225, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--primary-green);
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Error message styling */
+      #errorMessage {
+        display: none;
+        color: var(--danger-red);
+        margin-top: 12px;
+        padding: 12px 16px;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 6px;
+        font-size: 14px;
+        animation: slideInUp 0.3s ease-out;
       }
     </style>
   </head>
 
   <body>
-    <!-- Login section shown before authentication -->
+    <!-- LOGIN SCREEN -->
     <div class="container" id="signin">
-      <h1>Kelompok 14 - Smoke Detector Prototype</h1>
-      <h2>Connect your device to start monitoring</h2>
+      <h1>Kelompok 14: Smart Smoke Detector</h1>
+      <h2>Real-time Air Quality Monitoring System</h2>
 
-    <!-- Connection Error Modal -->
+      <!-- Connection Error Modal -->
       <div id="connectionErrorModal" class="alert-overlay">
         <div class="alert-box">
-          <h2>⚠️ No Connection Found</h2>
-          <p>Unable to connect to your device.<br/>Please check your WiFi settings and try again.</p>
-          <button onclick="closeConnectionError()">OK</button>
+          <h2>⚠️ Connection Error</h2>
+          <p>
+            Unable to connect to your device.<br />Please verify your WiFi
+            settings and try again.
+          </p>
+          <button onclick="closeConnectionError()">Dismiss</button>
         </div>
       </div>
 
       <!-- Success Modal -->
       <div id="successModal" class="alert-overlay">
         <div class="alert-box">
-          <h2 style='color:#10b981'>✓ Connected Successfully!</h2>
-          Your device is now connected.<br/>
-          Redirecting you shortly...
-          </p>
-          <!-- Auto-close handled by main flow -->
+          <h2 style="color: #10b981">Connected Successfully</h2>
+          <p>Your device is now connected and ready for monitoring.</p>
         </div>
       </div>
 
@@ -210,8 +704,9 @@
           type="text"
           id="ssid"
           name="ssid"
-          placeholder="Enter WiFi name"
+          placeholder="Enter your username"
           required
+          autocomplete="username"
         />
 
         <label for="password">Password</label>
@@ -219,62 +714,111 @@
           type="password"
           id="password"
           name="password"
-          placeholder="Enter WiFi password"
+          placeholder="Enter your password"
           required
+          autocomplete="current-password"
         />
 
-        <div
-          id="errorMessage"
-          style="display: none; color: #ff5252; margin-top: 10px"
-        ></div>
+        <div id="errorMessage"></div>
 
         <button type="submit">Connect Device →</button>
       </form>
     </div>
 
-    <div class="container" id="dashboard">
-      <!-- Main dashboard shown after successful login -->
-      <header>
-        <h1>Kelompok 14 - Smoke Detector Prototype Dashboard</h1>
-        <div class="status">
-          Connected to: <span id="connectedSSID"></span><br />
-          Last update: <span id="time">--:--</span>
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboard">
+      <div class="container">
+        <div class="dashboard-header">
+          <h1>Monitoring Dashboard</h1>
+          <div class="header-status">
+            <div class="status-item">
+              <span class="label">Connected to:</span>
+              <span class="value" id="connectedSSID">--</span>
+            </div>
+            <div class="status-item">
+              <span class="label">Last Update:</span>
+              <span class="value" id="time">--:--</span>
+            </div>
+          </div>
         </div>
-      </header>
 
-      <div class="section">
-        <h3>Real-time Gas Density (%)</h3>
-        <div id="score" class="aqi">--</div>
-        <p id="statusText">Waiting for sensor…</p>
-      </div>
+        <div class="grid">
+          <!-- Current Gas Density Section -->
+          <div class="section">
+            <h3>📊 Real-time Gas Density</h3>
+            <div class="metric-display">
+              <div class="aqi-score" id="score">--</div>
+              <div
+                style="
+                  font-size: 14px;
+                  color: var(--text-secondary);
+                  margin-top: 8px;
+                "
+              >
+                % Concentration
+              </div>
+            </div>
+            <p class="status-text" id="statusText">Connecting to device...</p>
+          </div>
 
-      <div class="section">
-        <h3>Smoke Breach Count</h3>
-        <div id="breach" class="breach">0</div>
-        <p id="breachText">No smoke breaches detected so far.</p>
-        <button onclick="showBreachHistory()">View Breach History</button>
-      </div>
+          <!-- Smoke Emission Count Section -->
+          <div class="section">
+            <h3>🚨 Emission Detection</h3>
+            <div class="metric-display">
+              <div class="emission-count" id="emission">0</div>
+              <div
+                style="
+                  font-size: 14px;
+                  color: var(--text-secondary);
+                  margin-top: 8px;
+                "
+              >
+                Events Detected
+              </div>
+            </div>
+            <p class="status-text" id="emissionText">
+              No smoke emissiones detected.
+            </p>
+            <div class="button-group">
+              <button onclick="showEmissionHistory()">📋 View History</button>
+              <button
+                onclick="resetEmissionCount()"
+                style="
+                  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+                "
+              >
+                🔄 Reset
+              </button>
+            </div>
+          </div>
 
-      <div class="section" id="breachHistory" style="display: none">
-        <h3>Breach History</h3>
-        <ul id="breachList" style="color: #ccc"></ul>
-        <button
-          onclick="
-            document.getElementById('breachHistory').style.display = 'none'
-          "
-        >
-          Close
-        </button>
+          <!-- Emission History Graph -->
+          <div class="graph-container">
+            <h3>📈 Emission History Analysis</h3>
+            <canvas id="emissionChart"></canvas>
+            <div id="emissionHistory" style="display: none">
+              <h3>Detailed Emission Log</h3>
+              <ul id="emissionList" class="item-list"></ul>
+              <button
+                onclick="closeEmissionHistory()"
+                style="width: 100%; margin-top: 16px"
+              >
+                Close Log
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- Smoke Detection Alert Modal -->
     <div id="alertOverlay" class="alert-overlay">
-      <!-- Full-screen alert modal for smoke detection -->
       <div class="alert-box">
         <h2>🚨 Smoke Detected</h2>
         <p>
-          Air quality is unhealthy.<br />Please check for smoke or fire
-          immediately.
+          Air quality has exceeded safe levels.<br />Please check for smoke or
+          fire immediately.
         </p>
         <button onclick="acknowledgeAlert()">I Understand</button>
       </div>
@@ -282,15 +826,191 @@
 
     <script>
       // ========== STATE VARIABLES ==========
-      let breachCount = 0; // Number of high air quality events
-      let Updated = false; // Flag to prevent duplicate breach counting
-      let alertGiven = false; // Flag for quick spike alerts
-      let breachHistory = []; // Array of timestamps for breach events
-      let prevScore = null; // Previous AQI reading for delta comparison
-      const DEVIATION_LIMIT = 10; // Threshold for rapid change detection
+      let emissionCount = 0;
+      let Updated = false;
+      let alertGiven = false;
+      let emissionHistory = [];
+      let prevScore = null;
+      const DEVIATION_LIMIT = 5; // Reduced from 10 for better responsiveness
+      let emissionChart = null;
+      let emissionDataByDay = {}; // Track emissiones by day
+
+      // ========== INITIALIZATION ==========
+      /**
+       * Initialize the emission chart on page load
+       */
+      window.addEventListener("load", function () {
+        initializeEmissionChart();
+      });
+
+      /**
+       * Initialize Chart.js for emission history visualization
+       */
+      function initializeEmissionChart() {
+        const ctx = document.getElementById("emissionChart").getContext("2d");
+
+        emissionChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: getLastXDays(7),
+            datasets: [
+              {
+                label: "Smoke Emissiones Per Day",
+                data: getEmissionDataForDays(7),
+                backgroundColor: [
+                  "rgba(16, 185, 129, 0.8)",
+                  "rgba(249, 115, 22, 0.8)",
+                  "rgba(239, 68, 68, 0.8)",
+                  "rgba(139, 92, 246, 0.8)",
+                  "rgba(59, 130, 246, 0.8)",
+                  "rgba(236, 72, 153, 0.8)",
+                  "rgba(14, 165, 233, 0.8)",
+                ],
+                borderColor: [
+                  "rgba(16, 185, 129, 1)",
+                  "rgba(249, 115, 22, 1)",
+                  "rgba(239, 68, 68, 1)",
+                  "rgba(139, 92, 246, 1)",
+                  "rgba(59, 130, 246, 1)",
+                  "rgba(236, 72, 153, 1)",
+                  "rgba(14, 165, 233, 1)",
+                ],
+                borderWidth: 2,
+                borderRadius: 6,
+                borderSkipped: false,
+                hoverBackgroundColor: [
+                  "rgba(16, 185, 129, 1)",
+                  "rgba(249, 115, 22, 1)",
+                  "rgba(239, 68, 68, 1)",
+                  "rgba(139, 92, 246, 1)",
+                  "rgba(59, 130, 246, 1)",
+                  "rgba(236, 72, 153, 1)",
+                  "rgba(14, 165, 233, 1)",
+                ],
+                hoverBorderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  color: "#cbd5e1",
+                  usePointStyle: true,
+                  padding: 16,
+                  font: {
+                    family: '"Roboto", sans-serif',
+                    size: 13,
+                    weight: "500",
+                  },
+                },
+              },
+              tooltip: {
+                backgroundColor: "rgba(30, 41, 59, 0.9)",
+                titleColor: "#f1f5f9",
+                bodyColor: "#cbd5e1",
+                borderColor: "rgba(71, 85, 105, 0.5)",
+                borderWidth: 1,
+                padding: 12,
+                titleFont: {
+                  family: '"Roboto", sans-serif',
+                  size: 14,
+                  weight: "600",
+                },
+                bodyFont: {
+                  family: '"Roboto", sans-serif',
+                  size: 13,
+                },
+                corners: 6,
+              },
+            },
+            scales: {
+              x: {
+                grid: {
+                  color: "rgba(71, 85, 105, 0.1)",
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: "#cbd5e1",
+                  font: {
+                    family: '"Roboto", sans-serif',
+                    size: 12,
+                    weight: "400",
+                  },
+                },
+              },
+              y: {
+                grid: {
+                  color: "rgba(71, 85, 105, 0.1)",
+                  drawBorder: false,
+                },
+                ticks: {
+                  color: "#cbd5e1",
+                  stepSize: 1,
+                  beginAtZero: true,
+                  font: {
+                    family: '"Roboto", sans-serif',
+                    size: 12,
+                    weight: "400",
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      /**
+       * Get last X days in format "Mon", "Tue", etc.
+       */
+      function getLastXDays(count) {
+        const days = [];
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        for (let i = count - 1; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          days.push(dayNames[date.getDay()]);
+        }
+
+        return days;
+      }
+
+      /**
+       * Get emission data for last X days
+       */
+      function getEmissionDataForDays(count) {
+        const data = [];
+
+        for (let i = count - 1; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          const dateKey = date.toLocaleDateString();
+          data.push(emissionDataByDay[dateKey] || 0);
+        }
+
+        return data;
+      }
+
+      /**
+       * Update the emission chart with new data
+       */
+      function updateEmissionChart() {
+        if (emissionChart) {
+          emissionChart.data.labels = getLastXDays(7);
+          emissionChart.data.datasets[0].data = getEmissionDataForDays(7);
+          emissionChart.update();
+        }
+      }
 
       // ========== AUTHENTICATION ==========
-      // Form submission handler for user login
+      /**
+       * Form submission handler for user login
+       * Validates credentials and shows dashboard on success
+       */
       document
         .getElementById("userID")
         .addEventListener("submit", async function (e) {
@@ -308,17 +1028,27 @@
             const result = await response.json();
             if (result.success) {
               document.getElementById("connectedSSID").textContent = ssid;
-              document.getElementById("signin").style.display = "none";
-              document.getElementById("dashboard").style.display = "block";
+
+              // Show success modal
+              document.getElementById("successModal").style.display = "flex";
+              document.body.style.overflow = "hidden";
+
+              // Transition to dashboard after delay
+              setTimeout(() => {
+                document.getElementById("signin").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("successModal").style.display = "none";
+                document.body.style.overflow = "auto";
+                load(); // Initial load
+              }, 1500);
             } else {
               const errorMsg = document.getElementById("errorMessage");
               errorMsg.textContent =
-                "Wrong SSID or password — please try again.";
+                "❌ Incorrect credentials. Please try again.";
               errorMsg.style.display = "block";
 
               document.getElementById("ssid").value = "";
               document.getElementById("password").value = "";
-
               document.getElementById("ssid").focus();
             }
           } catch (err) {
@@ -330,8 +1060,7 @@
       // ========== POLLING AND DATA HANDLING ==========
       /**
        * Load air quality data from device and update UI
-       * Fetches AQI score from /aqi endpoint and updates dashboard
-       * Triggers alerts if thresholds exceeded or rapid changes detected
+       * Fetches AQI score from /aqi endpoint with improved delta calculation
        */
       async function load() {
         try {
@@ -358,89 +1087,118 @@
             alertGiven = false;
           }
 
-          // Determine air quality status and update UI colors
+          // Determine air quality status and update UI
           if (s <= 40) {
             // Safe air quality
             el.style.color = "#10b981";
             st.textContent =
-              "Air quality is safe — enjoy fresh air and keep smoke-free habits.";
+              "✓ Safe Zone - Air quality is good. Keep up good ventilation practices.";
             Updated = false;
           } else if (s <= 60) {
             // Moderate air quality
-            el.style.color = "#facc15";
+            el.style.color = "#f59e0b";
             st.textContent =
-              "Air quality is a bit poor — avoid unnecessary smoking to prevent worsening conditions.";
+              "⚠️ Caution - Moderate smoke detected. Consider reducing smoking activities.";
             Updated = false;
           } else {
-            // Poor/dangerous air quality - trigger alert
+            // Poor/dangerous air quality
             el.style.color = "#ef4444";
             st.textContent =
-              "Air quality is unhealthy — reduce smoking activities to help lower smoke levels and protect health.";
+              "🚨 Alert - High smoke levels detected. Immediate action recommended.";
             if (!Updated) {
-              // Record breach event
-              breachCount++;
+              // Record emission event with timestamp
+              emissionCount++;
               const now = new Date();
               const timestamp =
                 now.toLocaleDateString() + " " + now.toLocaleTimeString();
-              breachHistory.push(timestamp);
-              Updated = true;
+              const dateKey = now.toLocaleDateString();
 
+              emissionHistory.push(timestamp);
+              emissionDataByDay[dateKey] =
+                (emissionDataByDay[dateKey] || 0) + 1;
+
+              updateEmissionChart();
               showAlert();
+              Updated = true;
             }
           }
 
           // Store current reading for next delta calculation
           prevScore = s;
 
-          document.getElementById("breach").textContent = breachCount;
-          document.getElementById("breachText").textContent =
-            breachCount > 0
-              ? "Smoke breaches detected!"
-              : "No smoke breaches detected so far.";
+          document.getElementById("emission").textContent = emissionCount;
+          document.getElementById("emissionText").textContent =
+            emissionCount > 0
+              ? `${emissionCount} smoke emission${emissionCount !== 1 ? "es" : ""} detected!`
+              : "No smoke emissiones detected.";
 
           // Update timestamp
           document.getElementById("time").textContent =
             new Date().toLocaleTimeString();
         } catch (e) {
           // Device is offline
-          document.getElementById("statusText").textContent = "ESP32 offline";
-          showConnectionError();
+          document.getElementById("statusText").textContent =
+            "📵 Device offline";
+          console.error("Fetch error:", e);
         }
       }
 
       // ========== UI INTERACTIONS ==========
       /**
-       * Display breach history modal
-       * Shows list of all high air quality events with timestamps
+       * Display emission history modal with detailed log
        */
-      function showBreachHistory() {
-        const list = document.getElementById("breachList");
+      function showEmissionHistory() {
+        const list = document.getElementById("emissionList");
         list.innerHTML = "";
-        breachHistory.forEach((entry) => {
+
+        if (emissionHistory.length === 0) {
           const li = document.createElement("li");
-          li.textContent = entry;
+          li.textContent = "No emission events recorded yet.";
           list.appendChild(li);
-        });
-
-        const historySection = document.getElementById("breachHistory");
-
-        document.getElementById("breachHistory").style.display = "block";
-        historySection.scrollIntoView({ behavior: "smooth", block: "start" });
-
-        function autoCloseOnScroll() {
-          const rect = historySection.getBoundingClientRect();
-
-          if (
-            window.scrollY === 0 ||
-            rect.top > window.innerHeight ||
-            rect.bottom < 0
-          ) {
-            historySection.style.display = "none";
-            window.removeEventListener("scroll", autoCloseOnScroll);
-          }
+        } else {
+          // Display in reverse chronological order
+          emissionHistory
+            .slice()
+            .reverse()
+            .forEach((entry) => {
+              const li = document.createElement("li");
+              li.innerHTML = `<strong>🔔</strong> ${entry}`;
+              list.appendChild(li);
+            });
         }
 
-        window.addEventListener("scroll", autoCloseOnScroll);
+        document.getElementById("emissionHistory").style.display = "block";
+      }
+
+      /**
+       * Close emission history modal
+       */
+      function closeEmissionHistory() {
+        document.getElementById("emissionHistory").style.display = "none";
+      }
+
+      /**
+       * Reset emission counter and history
+       */
+      function resetEmissionCount() {
+        if (
+          confirm(
+            "Are you sure you want to reset the emission counter? This cannot be undone.",
+          )
+        ) {
+          emissionCount = 0;
+          emissionHistory = [];
+          emissionDataByDay = {};
+
+          document.getElementById("emission").textContent = "0";
+          document.getElementById("emissionText").textContent =
+            "No smoke emissiones detected.";
+          document.getElementById("emissionList").innerHTML = "";
+
+          updateEmissionChart();
+
+          showNotification("✓ Emission counter reset successfully", "success");
+        }
       }
 
       /**
@@ -448,7 +1206,12 @@
        */
       function showAlert() {
         document.getElementById("alertOverlay").style.display = "flex";
-        document.body.style.overflow = "hidden"; // lock scroll
+        document.body.style.overflow = "hidden";
+
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+          acknowledgeAlert();
+        }, 5000);
       }
 
       /**
@@ -477,35 +1240,50 @@
 
       /**
        * Show toast notification for rapid air quality changes
-       * Displays temporary warning at top of screen
+       * Displays elegant notification at top-right of screen
        */
       function showWarning() {
         const toast = document.createElement("div");
-        toast.textContent =
-          "⚠️ Sudden change in air quality detected. Possible increase in active smoke sources.";
-        toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: #1c1917;
-                color: #fde68a;
-                padding: 12px 18px;
-                border-radius: 8px;
-                font-size: 15px;
-                z-index: 9999;
-                box-shadow: 0 0 20px rgba(251,146,60,0.5);
-                border-left: 5px solid #fb923c;
-            `;
+        toast.className = "toast";
+        toast.innerHTML = `
+          <strong>⚠️ Alert:</strong> Sudden spike in smoke detected. ${Math.round((prevScore || 0) + DEVIATION_LIMIT)}% increase in gas density.
+        `;
 
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 7000);
+
+        setTimeout(() => {
+          toast.classList.add("fade-out");
+          setTimeout(() => toast.remove(), 300);
+        }, 6000);
+      }
+
+      /**
+       * Show generic notification toast
+       */
+      function showNotification(message, type = "info") {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = message;
+
+        if (type === "success") {
+          toast.style.borderLeftColor = "#10b981";
+          toast.style.color = "#10b981";
+        } else if (type === "error") {
+          toast.style.borderLeftColor = "#ef4444";
+          toast.style.color = "#ef4444";
+        }
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.classList.add("fade-out");
+          setTimeout(() => toast.remove(), 300);
+        }, 5000);
       }
 
       // ========== MAIN LOOP ==========
       // Poll device every 1 second for AQI updates
       setInterval(load, 1000);
-      load();
     </script>
   </body>
 </html>

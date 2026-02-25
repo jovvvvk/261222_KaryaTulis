@@ -7,6 +7,9 @@
  * - User authentication (/login)
  * - Air quality monitoring (/aqi)
  * - Web interface serving (/)
+ * 
+ * Uses LittleFS for serving static web files and ArduinoJson for JSON serialization.
+ * All endpoints are documented with their expected request/response formats.
  */
 
 #include "wifi_server.h"
@@ -16,9 +19,8 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-// Placeholder for HTML content loaded from SPIFFS
-static const char index_html[] PROGMEM = "";
-
+// External variable for air quality reading from main.cpp
+extern float airQuality;
 
 /**
  * @brief Constructor - Initialize server with port number
@@ -28,26 +30,33 @@ DeviceServer::DeviceServer(uint16_t port) : server(port) {}
 
 /**
  * @brief Initialize WiFi access point and HTTP endpoints
+ * Sets up WiFi AP, initializes LittleFS, and registers all API endpoints.
  * @return true if setup successful, false on failure
  */
 bool DeviceServer::begin() {
     // Initialize LittleFS filesystem for web files
     if (!LittleFS.begin()) {
-        Serial.println("Failed to mount LittleFS!");
+        Serial.println("[ERROR] Failed to mount LittleFS!");
         return false;
     }
     
     // Start WiFi in Access Point mode
     WiFi.mode(WIFI_AP);
-    if (!WiFi.softAP(ssid, password)) return false;
+    if (!WiFi.softAP(ssid, password)) {
+        Serial.println("[ERROR] Failed to start WiFi AP!");
+        return false;
+    }
     
     // Store and report IP address
     IP = WiFi.softAPIP();
-    Serial.print("IP address: ");
+    Serial.print("[INFO] WiFi AP started. IP address: ");
     Serial.println(IP);
 
-    // Endpoint: /status (GET)
-    // Returns device IP and WiFi signal strength
+    // ========== ENDPOINT: /status (GET) ==========
+    /**
+     * Returns device status information
+     * Response: {"ip": "192.168.4.1", "rssi": -45}
+     */
     server.on("/status", HTTP_GET, [this]() {
         JsonDocument doc;
         doc["ip"] = WiFi.softAPIP().toString();
@@ -58,9 +67,12 @@ bool DeviceServer::begin() {
         server.send(200, "application/json", buffer);
     });
 
-    // Endpoint: /login (POST)
-    // Authenticates user credentials against allowedUsers array
-    // Expects JSON: {"ssid": "username", "pass": "password"}
+    // ========== ENDPOINT: /login (POST) ==========
+    /**
+     * Authenticates user credentials against allowedUsers array
+     * Request: {"ssid": "username", "pass": "password"}
+     * Response: {"success": true} or {"success": false}
+     */
     server.on("/login", HTTP_POST, [this]() {
         if (server.hasArg("plain")) {
             JsonDocument doc;
@@ -68,6 +80,7 @@ bool DeviceServer::begin() {
 
             // Return error if JSON is malformed
             if (err) {
+                Serial.println("[ERROR] Invalid JSON in login request");
                 server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
                 return;
             }
@@ -83,6 +96,8 @@ bool DeviceServer::begin() {
                     strcmp(inputSSID, allowedUsers[i].user) == 0 &&
                     strcmp(inputPass, allowedUsers[i].pass) == 0) {
                     authenticated = true;
+                    Serial.print("[INFO] User authenticated: ");
+                    Serial.println(inputSSID);
                     break;
                 }
             }
@@ -95,13 +110,17 @@ bool DeviceServer::begin() {
             );
         } 
         else {
+            Serial.println("[ERROR] No body in login request");
             server.send(400, "application/json", "{\"error\":\"Bad Request\"}");
         }
     });
 
-
-    // Endpoint: /aqi (GET)
-    // Returns current air quality index score (0-100)
+    // ========== ENDPOINT: /aqi (GET) ==========
+    /**
+     * Returns current air quality index score
+     * Response: {"score": 45.5}
+     * Score range: 0-100 (0=clean, 100=dangerous)
+     */
     server.on("/aqi", HTTP_GET, [this]() {
         JsonDocument doc;
         doc["score"] = airQuality;
@@ -111,26 +130,39 @@ bool DeviceServer::begin() {
         server.send(200, "application/json", buffer);
     });
 
-    // Endpoint: / (GET)
-    // Serves web interface from LittleFS filesystem
+    // ========== ENDPOINT: / (GET) ==========
+    /**
+     * Serves web interface (index.html) from LittleFS filesystem
+     * Displays responsive dashboard for air quality monitoring
+     */
     server.on("/", HTTP_GET, [this]() {
         if (LittleFS.exists("/index.html")) {
             File file = LittleFS.open("/index.html", "r");
             server.streamFile(file, "text/html");
             file.close();
         } else {
+            Serial.println("[ERROR] index.html not found in LittleFS");
             server.send(404, "text/plain", "index.html not found");
         }
     });
 
+    // Handle 404 Not Found
+    server.onNotFound([this]() {
+        Serial.print("[WARN] Unknown endpoint requested: ");
+        Serial.println(server.uri());
+        server.send(404, "application/json", "{\"error\":\"Endpoint not found\"}");
+    });
+
     // Start the web server
     server.begin();
+    Serial.println("[INFO] HTTP server started on port 80");
     return true;
 }
 
 /**
  * @brief Process incoming HTTP requests
- * Call this repeatedly in main loop to handle client requests.
+ * Should be called repeatedly in main loop to handle client requests.
+ * Non-blocking call that processes pending requests.
  */
 void DeviceServer::handle() {
     server.handleClient();
@@ -138,5 +170,6 @@ void DeviceServer::handle() {
 
 /**
  * @brief Destructor
+ * Cleans up server resources (if needed)
  */
 DeviceServer::~DeviceServer() {}
