@@ -24,7 +24,7 @@
 #define DEBUG  // Enable serial debug output
 
 // ========== PIN ASSIGNMENTS ==========
-const int LED_pins = 26;  // GPIO 26: Output pin for alarm LED indicator
+const int LED_pins = 27;  // GPIO 27: Output pin for alarm LED indicator
 const int Sensor_pin = 32;  // GPIO 32: Analog input pin for smoke/gas sensor (ADC)
 
 // ========== ALERT THRESHOLDS ==========

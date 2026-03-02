@@ -8,8 +8,14 @@
   - Roboto font for modern typography
   - Chart.js for emission history visualization
   - Responsive CSS Grid and Flexbox
-  - Glassmorphism design pattern with backdrop filters
+  - Natural color palette with solid colors
   - Smooth animations and transitions
+
+  Access URL:
+  - http://kelompok14.local (local network using mDNS)
+  - http://192.168.4.1 (direct IP address)
+  
+  To use kelompok14.local, configure mDNS on your ESP device in the firmware.
 -->
 <!doctype html>
 <html lang="en">
@@ -23,7 +29,6 @@
     />
     <title>Kelompok 14 - Smoke Detector Prototype</title>
 
-    <!-- Modern font - Roboto -->
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
       rel="stylesheet"
@@ -33,6 +38,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <!-- Responsive and modern styling -->
+    <!-- Responsive and modern styling -->
     <style>
       * {
         margin: 0;
@@ -41,20 +47,20 @@
       }
 
       :root {
-        /* Modern color palette */
-        --primary-green: #10b981;
-        --success: #059669;
-        --warning-yellow: #f59e0b;
-        --danger-red: #ef4444;
-        --dark-red: #dc2626;
-        --background: #0f172a;
-        --surface: #1e293b;
-        --surface-light: #334155;
-        --text-primary: #f1f5f9;
-        --text-secondary: #cbd5e1;
-        --border: #475569;
-        --accent-orange: #f97316;
-        --accent-purple: #8b5cf6;
+        /* Natural, warm color palette */
+        --primary-green: #7b9e5e;
+        --success: #6b8e4e;
+        --warning-yellow: #c9a961;
+        --danger-red: #d4543f;
+        --dark-red: #c1422f;
+        --background: #f5f5f0;
+        --surface: #fffef8;
+        --surface-light: #f0ebe0;
+        --text-primary: #2c2416;
+        --text-secondary: #5a4d42;
+        --border: #d4cfc7;
+        --accent-orange: #c9844d;
+        --accent-purple: #8b7355;
       }
 
       html {
@@ -67,18 +73,134 @@
           -apple-system,
           BlinkMacSystemFont,
           sans-serif;
-        background: linear-gradient(135deg, var(--background) 0%, #1a2942 100%);
+        background: var(--background);
         color: var(--text-primary);
         margin: 0;
         padding: 0;
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
       }
 
-      /* Login screen styling */
+      /* Header styling for both pages */
+      .page-header {
+        width: 100%;
+        padding: 24px 16px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      /* Logo Container */
+      .logo-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 32px;
+        flex-wrap: wrap;
+      }
+
+      .logo {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        font-size: 36px;
+        color: var(--primary-green);
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 8px;
+      }
+
+      /* Title area below logos */
+      .header-title {
+        text-align: center;
+      }
+
+      .header-title h1 {
+        margin: 0;
+      }
+
+      .header-title h2 {
+        margin: 8px 0 0 0;
+        font-size: 14px;
+      }
+
+      /* Layout adjustments for header/body/footer */
       #signin {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      /* Dashboard wrapper */
+      #dashboard {
+        width: 100%;
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      /* Footer styling - fixed at bottom */
+      .page-footer {
+        width: 100%;
+        padding: 20px 16px;
+        background: var(--surface-light);
+        border-top: 1px solid var(--border);
+        text-align: center;
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: auto;
+      }
+
+      .page-footer p {
+        margin: 6px 0;
+        line-height: 1.4;
+      }
+
+      .page-footer h4 {
+        margin: 0 0 8px 0;
+        font-size: 14px;
+        color: var(--primary-green);
+        font-weight: 600;
+      }
+
+      .page-footer .description {
+        font-size: 12px;
+        margin: 4px 0 8px 0;
+      }
+
+      .page-footer .names {
+        font-size: 11px;
+        margin: 6px 0 4px 0;
+      }
+
+      .page-footer .emails {
+        font-size: 9px;
+        color: var(--text-secondary);
+        word-break: break-all;
+        margin: 4px 0 0 0;
+      }
+
+      /* Login form container */
+      .signin-form {
         width: 100%;
         max-width: 450px;
         margin: auto;
@@ -88,14 +210,18 @@
       .container {
         width: 100%;
         padding: 32px 24px;
-        background: rgba(30, 41, 59, 0.8);
-        border: 1px solid rgba(71, 85, 105, 0.3);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        box-shadow:
-          0 10px 40px rgba(0, 0, 0, 0.4),
-          0 0 1px rgba(16, 185, 129, 0.1);
-        animation: slideInUp 0.5s ease-out;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        animation: slideInUp 0.4s ease-out;
+      }
+
+      .dashboard-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px;
       }
 
       @keyframes slideInUp {
@@ -111,17 +237,10 @@
 
       h1 {
         text-align: center;
-        background: linear-gradient(
-          135deg,
-          var(--primary-green) 0%,
-          var(--accent-orange) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--primary-green);
         margin-bottom: 12px;
         font-size: 28px;
-        font-weight: 700;
+        font-weight: 600;
         letter-spacing: -0.5px;
       }
 
@@ -158,35 +277,30 @@
         margin-top: 8px;
         border: 1px solid var(--border);
         border-radius: 8px;
-        background: rgba(51, 65, 85, 0.5);
+        background: var(--surface-light);
         color: var(--text-primary);
         font-size: 15px;
         font-family: "Roboto", sans-serif;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
       }
 
       input::placeholder {
-        color: rgba(203, 213, 225, 0.5);
+        color: var(--text-secondary);
+        opacity: 0.6;
       }
 
       input:focus {
         outline: none;
         border-color: var(--primary-green);
-        background: rgba(51, 65, 85, 0.7);
-        box-shadow:
-          0 0 0 3px rgba(16, 185, 129, 0.1),
-          inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        background: var(--surface);
+        box-shadow: 0 0 0 2px rgba(123, 158, 94, 0.1);
       }
 
       button {
         margin-top: 28px;
         width: 100%;
         padding: 14px 24px;
-        background: linear-gradient(
-          135deg,
-          var(--primary-green) 0%,
-          var(--success) 100%
-        );
+        background: var(--primary-green);
         color: #fff;
         border: none;
         border-radius: 8px;
@@ -194,13 +308,13 @@
         font-size: 16px;
         font-weight: 600;
         letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(123, 158, 94, 0.2);
       }
 
       button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        background: #6b8e4e;
+        box-shadow: 0 4px 12px rgba(123, 158, 94, 0.3);
       }
 
       button:active {
@@ -235,9 +349,9 @@
         gap: 32px;
         flex-wrap: wrap;
         padding: 16px 24px;
-        background: rgba(30, 41, 59, 0.5);
+        background: var(--surface-light);
         border-radius: 8px;
-        border: 1px solid rgba(71, 85, 105, 0.2);
+        border: 1px solid var(--border);
       }
 
       .status-item {
@@ -266,12 +380,11 @@
 
       .section {
         padding: 28px;
-        background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(71, 85, 105, 0.2);
+        background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        animation: fadeIn 0.5s ease-out;
+        transition: all 0.2s ease;
+        animation: fadeIn 0.4s ease-out;
       }
 
       @keyframes fadeIn {
@@ -286,8 +399,8 @@
       }
 
       .section:hover {
-        border-color: rgba(16, 185, 129, 0.2);
-        box-shadow: 0 8px 24px rgba(16, 185, 129, 0.1);
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 12px rgba(123, 158, 94, 0.1);
       }
 
       .metric-display {
@@ -297,16 +410,9 @@
 
       .aqi-score {
         font-size: 56px;
-        font-weight: 700;
+        font-weight: 600;
         margin: 16px 0;
-        background: linear-gradient(
-          135deg,
-          var(--primary-green) 0%,
-          var(--accent-orange) 100%
-        );
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--primary-green);
       }
 
       .emission-count {
@@ -325,10 +431,9 @@
       .graph-container {
         grid-column: 1 / -1;
         padding: 28px;
-        background: rgba(30, 41, 59, 0.6);
-        border: 1px solid rgba(71, 85, 105, 0.2);
+        background: var(--surface);
+        border: 1px solid var(--border);
         border-radius: 12px;
-        backdrop-filter: blur(10px);
       }
 
       .graph-container h3 {
@@ -336,7 +441,9 @@
       }
 
       #emissionChart {
-        max-height: 400px;
+        display: block;
+        width: 100% !important;
+        height: 350px !important;
         margin-bottom: 20px;
       }
 
@@ -364,8 +471,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.4);
         display: none;
         align-items: center;
         justify-content: center;
@@ -374,22 +480,20 @@
       }
 
       .alert-box {
-        background: rgba(30, 41, 59, 0.95);
+        background: var(--surface);
         padding: 40px;
-        border-radius: 16px;
+        border-radius: 12px;
         text-align: center;
         max-width: 420px;
-        box-shadow:
-          0 20px 60px rgba(0, 0, 0, 0.6),
-          0 0 1px rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(71, 85, 105, 0.3);
-        animation: slideInScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        border: 1px solid var(--border);
+        animation: slideInScale 0.3s ease-out;
       }
 
       @keyframes slideInScale {
         from {
           opacity: 0;
-          transform: scale(0.9) translateY(-20px);
+          transform: scale(0.95) translateY(-10px);
         }
         to {
           opacity: 1;
@@ -412,17 +516,15 @@
       }
 
       .alert-box button {
-        background: linear-gradient(
-          135deg,
-          var(--danger-red) 0%,
-          var(--dark-red) 100%
-        );
+        background: var(--danger-red);
         padding: 14px 32px;
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        box-shadow: 0 2px 8px rgba(212, 84, 63, 0.2);
+        margin-top: 0;
       }
 
       .alert-box button:hover {
-        box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+        background: #c1422f;
+        box-shadow: 0 4px 12px rgba(212, 84, 63, 0.3);
       }
 
       #successModal h2 {
@@ -430,11 +532,7 @@
       }
 
       #successModal button {
-        background: linear-gradient(
-          135deg,
-          var(--primary-green) 0%,
-          var(--success) 100%
-        );
+        background: var(--primary-green);
       }
 
       #connectionErrorModal h2 {
@@ -442,11 +540,7 @@
       }
 
       #connectionErrorModal button {
-        background: linear-gradient(
-          135deg,
-          var(--warning-yellow) 0%,
-          var(--accent-orange) 100%
-        );
+        background: var(--warning-yellow);
       }
 
       /* Toast notification */
@@ -454,16 +548,16 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background: rgba(30, 41, 59, 0.95);
+        background: var(--surface);
         color: var(--warning-yellow);
         padding: 16px 24px;
         border-radius: 8px;
         font-size: 14px;
         z-index: 9998;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         border-left: 4px solid var(--warning-yellow);
-        border: 1px solid rgba(71, 85, 105, 0.3);
-        animation: slideInToast 0.4s ease-out;
+        border: 1px solid var(--border);
+        animation: slideInToast 0.3s ease-out;
         max-width: 360px;
       }
 
@@ -503,7 +597,7 @@
       .item-list li {
         padding: 12px;
         margin: 8px 0;
-        background: rgba(51, 65, 85, 0.4);
+        background: var(--surface-light);
         border-left: 3px solid var(--primary-green);
         border-radius: 4px;
         font-size: 14px;
@@ -513,42 +607,97 @@
       }
 
       .item-list li:hover {
-        background: rgba(51, 65, 85, 0.6);
+        background: #f0ebe0;
         padding-left: 16px;
       }
 
       /* Responsive design for tablets and mobile */
       @media (max-width: 768px) {
-        body {
+        .page-header {
           padding: 16px;
+        }
+
+        .logo-container {
+          gap: 24px;
+        }
+
+        .logo {
+          width: 70px;
+          height: 70px;
+          font-size: 32px;
+        }
+
+        .logo img {
+          padding: 6px;
+        }
+
+        .header-title h1 {
+          font-size: 22px;
+        }
+
+        .header-title h2 {
+          font-size: 13px;
+        }
+
+        .page-footer {
+          padding: 16px 12px;
+          font-size: 10px;
+        }
+
+        .page-footer h4 {
+          font-size: 11px;
+          margin-bottom: 6px;
+        }
+
+        .page-footer .description {
+          font-size: 10px;
+        }
+
+        .page-footer .names {
+          font-size: 9px;
+        }
+
+        .page-footer .emails {
+          font-size: 8px;
+        }
+
+        body {
+          padding: 16px 0;
         }
 
         .container {
           padding: 24px 20px;
+          margin: 0 16px;
+          border-radius: 12px;
         }
 
         #dashboard {
-          padding: 16px;
+          padding: 16px 0;
+          max-width: 100%;
         }
 
         .dashboard-header {
           flex-direction: column;
           margin-bottom: 24px;
+          gap: 16px;
         }
 
         .dashboard-header h1 {
           font-size: 24px;
+          margin-bottom: 0;
         }
 
         .header-status {
           width: 100%;
           flex-direction: column;
           gap: 16px;
+          background: var(--surface-light);
         }
 
         .grid {
           grid-template-columns: 1fr;
           gap: 16px;
+          margin: 0 16px;
         }
 
         .aqi-score {
@@ -568,7 +717,7 @@
         .toast {
           right: 16px;
           left: 16px;
-          max-width: none;
+          max-width: calc(100% - 32px);
         }
 
         .button-group {
@@ -577,55 +726,180 @@
 
         .button-group button {
           width: 100%;
+          min-width: auto;
+        }
+
+        #emissionChart {
+          height: 300px !important;
+        }
+
+        .graph-container {
+          padding: 20px 16px;
+          margin: 0 16px;
         }
       }
 
       @media (max-width: 480px) {
+        .page-header {
+          padding: 12px 8px;
+        }
+
+        .logo-container {
+          gap: 16px;
+        }
+
+        .logo {
+          width: 60px;
+          height: 60px;
+          font-size: 28px;
+        }
+
+        .logo img {
+          padding: 4px;
+        }
+
+        .header-title h1 {
+          font-size: 18px;
+        }
+
+        .header-title h2 {
+          font-size: 12px;
+        }
+
+        .page-footer {
+          padding: 12px 8px;
+          font-size: 8px;
+        }
+
+        .page-footer h4 {
+          font-size: 9px;
+          margin-bottom: 4px;
+        }
+
+        .page-footer .description {
+          font-size: 8px;
+        }
+
+        .page-footer .names {
+          font-size: 7px;
+        }
+
+        .page-footer .emails {
+          font-size: 6px;
+        }
+
+        body {
+          padding: 0;
+        }
+
         h1 {
-          font-size: 24px;
+          font-size: 22px;
+        }
+
+        h2 {
+          font-size: 14px;
         }
 
         .container {
           padding: 20px 16px;
           border-radius: 12px;
+          margin: 0 12px;
+          max-width: calc(100% - 24px);
+        }
+
+        #signin {
+          padding: 0;
+          max-width: 100%;
+        }
+
+        #dashboard {
+          padding: 0;
+        }
+
+        .grid {
+          margin: 0 12px;
+          gap: 12px;
         }
 
         .section {
-          padding: 20px;
+          padding: 16px;
+          border-radius: 8px;
         }
 
         .aqi-score {
-          font-size: 36px;
-        }
-
-        .emission-count {
           font-size: 32px;
         }
 
+        .emission-count {
+          font-size: 28px;
+        }
+
         label {
-          font-size: 13px;
+          font-size: 12px;
         }
 
         input {
           padding: 10px 12px;
           font-size: 14px;
+          border-radius: 6px;
         }
 
         button {
-          padding: 12px 20px;
-          font-size: 15px;
+          padding: 12px 16px;
+          font-size: 14px;
+          border-radius: 6px;
         }
 
         .alert-box {
-          padding: 24px 20px;
+          padding: 24px 16px;
+          margin: 16px;
+          max-width: calc(100% - 32px);
+          border-radius: 8px;
         }
 
         .alert-box h2 {
-          font-size: 20px;
+          font-size: 18px;
+          margin-bottom: 12px;
         }
 
         .alert-box p {
-          font-size: 14px;
+          font-size: 13px;
+          margin-bottom: 20px;
+        }
+
+        .dashboard-header {
+          flex-direction: column;
+          padding: 0 12px;
+        }
+
+        .header-status {
+          flex-direction: column;
+          padding: 12px;
+          gap: 8px;
+        }
+
+        .status-item {
+          font-size: 12px;
+        }
+
+        .metric-display {
+          margin: 16px 0;
+        }
+
+        #emissionChart {
+          height: 250px !important;
+          width: 100% !important;
+        }
+
+        .graph-container {
+          padding: 16px;
+          margin: 0 12px;
+          border-radius: 8px;
+        }
+
+        .graph-container h3 {
+          margin-bottom: 12px;
+          font-size: 16px;
         }
       }
 
@@ -663,8 +937,8 @@
         color: var(--danger-red);
         margin-top: 12px;
         padding: 12px 16px;
-        background: rgba(239, 68, 68, 0.1);
-        border: 1px solid rgba(239, 68, 68, 0.3);
+        background: rgba(212, 84, 63, 0.1);
+        border: 1px solid rgba(212, 84, 63, 0.2);
         border-radius: 6px;
         font-size: 14px;
         animation: slideInUp 0.3s ease-out;
@@ -673,10 +947,21 @@
   </head>
 
   <body>
+    <!-- PAGE HEADER WITH LOGOS -->
+    <div class="page-header" id="pageHeader">
+      <div class="logo-container">
+        <div class="logo" title="Logo G-Reflex"><img src="greflex.jpg" alt="G-Reflex"></div>
+        <div class="logo" title="Logo Gonzaga"><img src="gonzaga.jpg" alt="Gonzaga"></div>
+      </div>
+      <div class="header-title">
+        <h1>Kelompok 14: Smart Smoke Detector</h1>
+        <h2>Real-time Air Quality Monitoring System</h2>
+      </div>
+    </div>
+
     <!-- LOGIN SCREEN -->
-    <div class="container" id="signin">
-      <h1>Kelompok 14: Smart Smoke Detector</h1>
-      <h2>Real-time Air Quality Monitoring System</h2>
+    <div class="signin-form" id="signin">
+      <div class="container">
 
       <!-- Connection Error Modal -->
       <div id="connectionErrorModal" class="alert-overlay">
@@ -693,7 +978,7 @@
       <!-- Success Modal -->
       <div id="successModal" class="alert-overlay">
         <div class="alert-box">
-          <h2 style="color: #10b981">Connected Successfully</h2>
+          <h2 style="color: var(--primary-green)">Connected Successfully</h2>
           <p>Your device is now connected and ready for monitoring.</p>
         </div>
       </div>
@@ -723,11 +1008,21 @@
 
         <button type="submit">Connect Device →</button>
       </form>
+      </div>
+    </div>
+
+    <!-- PAGE FOOTER -->
+    <div class="page-footer">
+      <h4>Kelompok 14</h4>
+      <p class="description">Dibuat untuk G-Reflex SMA Kolese Gonzaga: Smoke Detector Berbasis IoT</p>
+      <p class="names">Jovan Kusuma, Jocelyn Mathilda Tambunan, Kristoffer Anugerah Toga Lumbantobing</p>
+      <p class="emails">37.jovan.kusuma@gonzaga.sch.id, 37.jocelyn.tambunan@gonzaga.sch.id, 37.kristoffer.lumbantobing@gonzaga.sch.id</p>
     </div>
 
     <!-- DASHBOARD SCREEN -->
-    <div id="dashboard">
-      <div class="container">
+    <div id="dashboard" style="display: none">
+      <div class="dashboard-container">
+        <div class="container">
         <div class="dashboard-header">
           <h1>Monitoring Dashboard</h1>
           <div class="header-status">
@@ -784,8 +1079,9 @@
               <button
                 onclick="resetEmissionCount()"
                 style="
-                  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-                  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+                  background: var(--accent-purple);
+                  box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
+                  margin-top: 0;
                 "
               >
                 🔄 Reset
@@ -796,7 +1092,9 @@
           <!-- Emission History Graph -->
           <div class="graph-container">
             <h3>📈 Emission History Analysis</h3>
-            <canvas id="emissionChart"></canvas>
+            <div style="position: relative; width: 100%; height: 350px">
+              <canvas id="emissionChart"></canvas>
+            </div>
             <div id="emissionHistory" style="display: none">
               <h3>Detailed Emission Log</h3>
               <ul id="emissionList" class="item-list"></ul>
@@ -855,50 +1153,27 @@
             labels: getLastXDays(7),
             datasets: [
               {
-                label: "Smoke Emissiones Per Day",
+                label: "Smoke Emissions Per Day",
                 data: getEmissionDataForDays(7),
-                backgroundColor: [
-                  "rgba(16, 185, 129, 0.8)",
-                  "rgba(249, 115, 22, 0.8)",
-                  "rgba(239, 68, 68, 0.8)",
-                  "rgba(139, 92, 246, 0.8)",
-                  "rgba(59, 130, 246, 0.8)",
-                  "rgba(236, 72, 153, 0.8)",
-                  "rgba(14, 165, 233, 0.8)",
-                ],
-                borderColor: [
-                  "rgba(16, 185, 129, 1)",
-                  "rgba(249, 115, 22, 1)",
-                  "rgba(239, 68, 68, 1)",
-                  "rgba(139, 92, 246, 1)",
-                  "rgba(59, 130, 246, 1)",
-                  "rgba(236, 72, 153, 1)",
-                  "rgba(14, 165, 233, 1)",
-                ],
-                borderWidth: 2,
-                borderRadius: 6,
+                backgroundColor: "#7b9e5e",
+                borderColor: "#6b8e4e",
+                borderWidth: 1,
+                borderRadius: 4,
                 borderSkipped: false,
-                hoverBackgroundColor: [
-                  "rgba(16, 185, 129, 1)",
-                  "rgba(249, 115, 22, 1)",
-                  "rgba(239, 68, 68, 1)",
-                  "rgba(139, 92, 246, 1)",
-                  "rgba(59, 130, 246, 1)",
-                  "rgba(236, 72, 153, 1)",
-                  "rgba(14, 165, 233, 1)",
-                ],
+                hoverBackgroundColor: "#6b8e4e",
                 hoverBorderWidth: 2,
               },
             ],
           },
           options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
+            indexAxis: "x",
             plugins: {
               legend: {
                 display: true,
                 labels: {
-                  color: "#cbd5e1",
+                  color: "#2c2416",
                   usePointStyle: true,
                   padding: 16,
                   font: {
@@ -909,10 +1184,10 @@
                 },
               },
               tooltip: {
-                backgroundColor: "rgba(30, 41, 59, 0.9)",
-                titleColor: "#f1f5f9",
-                bodyColor: "#cbd5e1",
-                borderColor: "rgba(71, 85, 105, 0.5)",
+                backgroundColor: "#fffef8",
+                titleColor: "#2c2416",
+                bodyColor: "#5a4d42",
+                borderColor: "#d4cfc7",
                 borderWidth: 1,
                 padding: 12,
                 titleFont: {
@@ -924,17 +1199,16 @@
                   family: '"Roboto", sans-serif',
                   size: 13,
                 },
-                corners: 6,
               },
             },
             scales: {
               x: {
                 grid: {
-                  color: "rgba(71, 85, 105, 0.1)",
+                  color: "rgba(212, 207, 199, 0.1)",
                   drawBorder: false,
                 },
                 ticks: {
-                  color: "#cbd5e1",
+                  color: "#5a4d42",
                   font: {
                     family: '"Roboto", sans-serif',
                     size: 12,
@@ -943,12 +1217,13 @@
                 },
               },
               y: {
+                beginAtZero: true,
                 grid: {
-                  color: "rgba(71, 85, 105, 0.1)",
+                  color: "rgba(212, 207, 199, 0.1)",
                   drawBorder: false,
                 },
                 ticks: {
-                  color: "#cbd5e1",
+                  color: "#5a4d42",
                   stepSize: 1,
                   beginAtZero: true,
                   font: {
@@ -1090,19 +1365,19 @@
           // Determine air quality status and update UI
           if (s <= 40) {
             // Safe air quality
-            el.style.color = "#10b981";
+            el.style.color = "#7b9e5e";
             st.textContent =
               "✓ Safe Zone - Air quality is good. Keep up good ventilation practices.";
             Updated = false;
           } else if (s <= 60) {
             // Moderate air quality
-            el.style.color = "#f59e0b";
+            el.style.color = "#c9a961";
             st.textContent =
               "⚠️ Caution - Moderate smoke detected. Consider reducing smoking activities.";
             Updated = false;
           } else {
             // Poor/dangerous air quality
-            el.style.color = "#ef4444";
+            el.style.color = "#d4543f";
             st.textContent =
               "🚨 Alert - High smoke levels detected. Immediate action recommended.";
             if (!Updated) {
@@ -1266,11 +1541,11 @@
         toast.textContent = message;
 
         if (type === "success") {
-          toast.style.borderLeftColor = "#10b981";
-          toast.style.color = "#10b981";
+          toast.style.borderLeftColor = "#7b9e5e";
+          toast.style.color = "#7b9e5e";
         } else if (type === "error") {
-          toast.style.borderLeftColor = "#ef4444";
-          toast.style.color = "#ef4444";
+          toast.style.borderLeftColor = "#d4543f";
+          toast.style.color = "#d4543f";
         }
 
         document.body.appendChild(toast);
