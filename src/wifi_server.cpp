@@ -163,47 +163,29 @@ bool DeviceServer::begin() {
      * Supports: .jpg, .png, .gif, .css, .js, .woff, .woff2, .svg formats
      * Automatically detects MIME type based on file extension
      */
-    server.onNotFound([this]() {
-        String uri = server.uri();
-        
-        // Check if file exists in LittleFS
-        if (LittleFS.exists(uri)) {
-            File file = LittleFS.open(uri, "r");
-            
-            // Determine MIME type based on file extension
-            String mimeType = "text/plain";
-            if (uri.endsWith(".jpg") || uri.endsWith(".jpeg")) {
-                mimeType = "image/jpeg";
-            } else if (uri.endsWith(".png")) {
-                mimeType = "image/png";
-            } else if (uri.endsWith(".gif")) {
-                mimeType = "image/gif";
-            } else if (uri.endsWith(".css")) {
-                mimeType = "text/css";
-            } else if (uri.endsWith(".js")) {
-                mimeType = "application/javascript";
-            } else if (uri.endsWith(".woff")) {
-                mimeType = "font/woff";
-            } else if (uri.endsWith(".woff2")) {
-                mimeType = "font/woff2";
-            } else if (uri.endsWith(".svg")) {
-                mimeType = "image/svg+xml";
-            }
-            
-            // Set cache control headers for browser caching (24 hours)
-            server.sendHeader("Cache-Control", "max-age=86400");
-            server.streamFile(file, mimeType);
+    // Serve static files (js, jpg, css, etc.) from LittleFS
+        server.onNotFound([this]() {
+        String path = server.uri();
+
+            if (LittleFS.exists(path)) {
+            File file = LittleFS.open(path, "r");
+
+            String contentType = "text/plain";
+            if (path.endsWith(".html"))                contentType = "text/html";
+            else if (path.endsWith(".js"))             contentType = "application/javascript";
+            else if (path.endsWith(".css"))            contentType = "text/css";
+            else if (path.endsWith(".jpg") ||
+                    path.endsWith(".jpeg"))           contentType = "image/jpeg";
+            else if (path.endsWith(".png"))            contentType = "image/png";
+
+            server.streamFile(file, contentType);
             file.close();
-            
-            Serial.print("[INFO] Served static file: ");
-            Serial.println(uri);
-        } else {
-            // File not found
-            Serial.print("[WARN] Static file not found: ");
-            Serial.println(uri);
-            server.send(404, "application/json", "{\"error\":\"File not found\"}");
-        }
-    });
+            return;}
+
+    Serial.print("[WARN] File not found: ");
+    Serial.println(path);
+    server.send(404, "application/json", "{\"error\":\"Not found\"}");
+});
 
     // Start the web server
     server.begin();
