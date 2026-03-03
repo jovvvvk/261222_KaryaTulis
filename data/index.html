@@ -196,7 +196,10 @@
 
       .page-footer .description {
         font-size: 12px;
-        margin: 0.1px 0 15px 0;
+        margin: 8px 0 12px 0;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--border);
+        line-height: 1.5;
       }
 
       .page-footer .names {
@@ -343,23 +346,28 @@
       }
 
       .dashboard-header {
-          display: flex;
-          justify-content: center; 
-          align-items: center;
-          margin-bottom: 32px;
-          flex-wrap: wrap;
-          gap: 20px;
-          position: relative;       
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 32px;
+        flex-wrap: wrap;
+        gap: 20px;
+        position: relative;
+        min-height: 60px;
       }
 
       .dashboard-header h1 {
-          position: absolute;     
-          left: 50%;
-          transform: translateX(-50%);
-          margin-bottom: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: 0;
       }
 
       .header-status {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
         display: flex;
         gap: 32px;
         flex-wrap: wrap;
@@ -370,7 +378,7 @@
       }
 
       .status-item {
-        text-align: right;
+        text-align: left;
         font-size: 13px;
       }
 
@@ -392,6 +400,31 @@
         gap: 24px;
         margin-bottom: 32px;
         position: relative;
+      }
+
+      /* Position emission history on the right of emission detection on wide screens */
+      @media (min-width: 1201px) {
+        .grid {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .grid > .section:nth-child(1) {
+          grid-column: 1;
+        }
+
+        .grid > .section:nth-child(2) {
+          grid-column: 2;
+        }
+
+        .grid > .graph-container {
+          grid-column: 1 / -1;
+        }
+
+        .grid > #emissionHistory {
+          grid-column: 3;
+          grid-row: 1 / 3;
+          align-self: start;
+        }
       }
 
       .section {
@@ -458,17 +491,23 @@
       }
 
       #emissionHistory {
-        position: absolute;
-        top: 60px;
-        right: 0;
-        width: 350px;
-        max-width: calc(100% - 20px);
+        position: relative;
+        width: 300px;
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 12px;
         padding: 20px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-        z-index: 100;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      @media (max-width: 1200px) {
+        #emissionHistory {
+          width: 100%;
+          max-height: none;
+          margin-top: 16px;
+        }
       }
 
       #emissionHistory h3 {
@@ -737,9 +776,13 @@
         .dashboard-header h1 {
           font-size: 24px;
           margin-bottom: 0;
+          position: relative;
+          left: auto;
+          transform: none;
         }
 
         .header-status {
+          position: static;
           width: 100%;
           flex-direction: column;
           gap: 16px;
@@ -796,14 +839,6 @@
         .graph-container {
           padding: 20px 16px;
           margin: 0 16px;
-        }
-
-        #emissionHistory {
-          position: static;
-          width: auto;
-          max-width: none;
-          margin-top: 16px;
-          padding: 16px;
         }
       }
 
@@ -899,9 +934,7 @@
         }
 
         #emissionHistory {
-          position: static;
-          width: auto;
-          max-width: none;
+          width: 100%;
           margin-top: 12px;
           padding: 12px;
         }
@@ -952,7 +985,14 @@
           padding: 0 12px;
         }
 
+        .dashboard-header h1 {
+          position: relative;
+          left: auto;
+          transform: none;
+        }
+
         .header-status {
+          position: static;
           flex-direction: column;
           padding: 12px;
           gap: 8px;
@@ -1116,7 +1156,7 @@
             <div class="section">
               <h3>📊 Real-time Gas Density</h3>
               <div class="metric-display">
-                <div class="aqi-score" id="score">--</div>
+                <div class="aqi-score" id="score">0</div>
                 <div
                   style="
                     font-size: 14px;
@@ -1127,7 +1167,7 @@
                   % Concentration
                 </div>
               </div>
-              <p class="status-text" id="statusText">Connecting to device...</p>
+              <p class="status-text" id="statusText">Waiting for sensor data...</p>
             </div>
 
             <!-- Smoke Emission Count Section -->
@@ -1169,16 +1209,18 @@
               <div style="position: relative; width: 100%; height: 350px">
                 <canvas id="emissionChart" width="800" height="350"></canvas>
               </div>
-              <div id="emissionHistory" style="display: none">
-                <h3>Detailed Emission Log</h3>
-                <ul id="emissionList" class="item-list"></ul>
-                <button
-                  onclick="closeEmissionHistory()"
-                  style="width: 100%; margin-top: 16px"
-                >
-                  Close Log
-                </button>
-              </div>
+            </div>
+
+            <!-- Emission History Log (positioned on the right of Emission Detection on wide screens) -->
+            <div id="emissionHistory" style="display: none">
+              <h3>Detailed Emission Log</h3>
+              <ul id="emissionList" class="item-list"></ul>
+              <button
+                onclick="closeEmissionHistory()"
+                style="width: 100%; margin-top: 16px"
+              >
+                Close Log
+              </button>
             </div>
           </div>
         </div>
