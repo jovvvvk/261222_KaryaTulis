@@ -15,7 +15,6 @@
   - http://kelompok14.local (local network using mDNS)
   - http://192.168.4.1 (direct IP address)
   
-  To use kelompok14.local, configure mDNS on your ESP device in the firmware.
 -->
 <!doctype html>
 <html lang="en">
@@ -428,7 +427,7 @@
       }
 
       .section {
-        padding: 28px;
+        padding: 24px;
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 12px;
@@ -454,32 +453,32 @@
 
       .metric-display {
         text-align: center;
-        margin: 24px 0;
+        margin: 20px 0 16px 0;
       }
 
       .aqi-score {
-        font-size: 56px;
-        font-weight: 600;
-        margin: 16px 0;
+        font-size: 52px;
+        font-weight: 700;
+        margin: 12px 0 8px 0;
         color: var(--primary-green);
       }
 
       .emission-count {
-        font-size: 48px;
+        font-size: 52px;
         font-weight: 700;
-        margin: 16px 0;
+        margin: 12px 0 8px 0;
       }
 
       .status-text {
         color: var(--text-secondary);
-        font-size: 14px;
-        line-height: 1.6;
-        margin-top: 12px;
+        font-size: 15px;
+        line-height: 1.5;
+        margin-top: 16px;
       }
 
       .graph-container {
         grid-column: 1 / -1;
-        padding: 28px;
+        padding: 24px;
         background: var(--surface);
         border: 1px solid var(--border);
         border-radius: 12px;
@@ -487,7 +486,7 @@
       }
 
       .graph-container h3 {
-        margin-bottom: 20px;
+        margin-bottom: 18px;
       }
 
       #emissionHistory {
@@ -538,13 +537,35 @@
         display: flex;
         gap: 12px;
         flex-wrap: wrap;
-        margin-top: 20px;
+        margin-top: 18px;
       }
 
       .button-group button {
         flex: 1;
         min-width: 140px;
         margin-top: 0;
+      }
+
+      /* Styling untuk tombol Lihat Riwayat (hijau) */
+      .button-group button:nth-child(1) {
+        background: var(--primary-green);
+        box-shadow: 0 2px 8px rgba(123, 158, 94, 0.2);
+      }
+
+      .button-group button:nth-child(1):hover {
+        background: #6b8e4e;
+        box-shadow: 0 4px 12px rgba(123, 158, 94, 0.3);
+      }
+
+      /* Styling untuk tombol Hapus Riwayat (oranye) */
+      .button-group button:nth-child(2) {
+        background: var(--accent-orange);
+        box-shadow: 0 2px 8px rgba(201, 132, 77, 0.2);
+      }
+
+      .button-group button:nth-child(2):hover {
+        background: #b37643;
+        box-shadow: 0 4px 12px rgba(201, 132, 77, 0.3);
       }
 
       .section button {
@@ -1088,20 +1109,20 @@
         <!-- Connection Error Modal -->
         <div id="connectionErrorModal" class="alert-overlay">
           <div class="alert-box">
-            <h2>⚠️ Connection Error</h2>
+            <h2>⚠️ Kesalahan Koneksi</h2>
             <p>
-              Unable to connect to your device.<br />Please verify your WiFi
-              settings and try again.
+              Tidak dapat terhubung ke perangkat Anda.<br />Silakan verifikasi pengaturan WiFi
+              dan coba lagi.
             </p>
-            <button onclick="closeConnectionError()">Dismiss</button>
+            <button onclick="tutupGalatKoneksi()">Tutup</button>
           </div>
         </div>
 
         <!-- Success Modal -->
         <div id="successModal" class="alert-overlay">
           <div class="alert-box">
-            <h2 style="color: var(--primary-green)">Tersambung</h2>
-            <p>Alat siap untuk mendeteksi asap</p>
+            <h2 style="color: var(--primary-green)">🛜 Tersambung</h2>
+            <p>Alat siap untuk mendeteksi asap!</p>
           </div>
         </div>
 
@@ -1138,7 +1159,7 @@
         <div class="dashboard-container">
           <div class="container">
           <div class="dashboard-header">
-            <h1>Papan Pemantauan</h1>
+            <h1>📋 Papan Pemantauan</h1>
             <div class="header-status">
               <div class="status-item">
                 <span class="label">Tersambung: </span>
@@ -1154,7 +1175,7 @@
           <div class="grid">
             <!-- Current Gas Density Section -->
             <div class="section">
-              <h3>Kepadatan Asap</h3>
+              <h3>💨 Kepadatan Asap</h3>
               <div class="metric-display">
                 <div class="aqi-score" id="score">0</div>
                 <div
@@ -1164,7 +1185,7 @@
                     margin-top: 8px;
                   "
                 >
-                  % (dalam persentase)
+                  ppm (bagian per juta)
                 </div>
               </div>
               <p class="status-text" id="statusText">Waiting for sensor data...</p>
@@ -1173,7 +1194,7 @@
             <!-- Smoke Emission Count Section -->
             <div class="section">
               <h3>🚬 Deteksi Asap Rokok</h3>
-              <div class="metric-display">
+              <div class="metric-display">  
                 <div class="emission-count" id="emission">0</div>
                 <div
                   style="
@@ -1182,22 +1203,18 @@
                     margin-top: 8px;
                   "
                 >
-                  Pelanggaran KTR
+                  Pelanggaran KTR Terdeteksi
                 </div>
+              </div>
+              <div class="status-text" id="calibrationStatus" style="font-size: 12px; margin-top: 12px; padding: 8px; background: var(--surface-light); border-radius: 6px; text-align: center;">
+                ⚙️ Status Kalibrasi: Siap
               </div>
               <p class="status-text" id="emissionText">
                 Tidak ada deteksi asap rokok.
               </p>
               <div class="button-group">
-                <button onclick="showEmissionHistory()">📋 Lihat Riwayat</button>
-                <button
-                  onclick="resetEmissionCount()"
-                  style="
-                    background: var(--accent-purple);
-                    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.2);
-                    margin-top: 0;
-                  "
-                >
+                <button onclick="tampilkanRiwayatAsap()">📋 Lihat Riwayat</button>
+                <button onclick="aturUlangJumlahAsap()">
                   🗑️ Hapus Riwayat
                 </button>
               </div>
@@ -1213,13 +1230,13 @@
 
             <!-- Emission History Log (positioned on the right of Emission Detection on wide screens) -->
             <div id="emissionHistory" style="display: none">
-              <h3>Detail Pelanggaran</h3>
+              <h3>🧾 Detail Pelanggaran</h3>
               <ul id="emissionList" class="item-list"></ul>
               <button
-                onclick="closeEmissionHistory()"
+                onclick="tutupRiwayatAsap()"
                 style="width: 100%; margin-top: 16px"
               >
-                Close Log
+                Tutup
               </button>
             </div>
           </div>
@@ -1243,60 +1260,60 @@
           Asap Rokok terdeteksi oleh alat.<br/>
           Silahkan lakukan pengecekan segera.
         </p>
-        <button onclick="acknowledgeAlert()">Oke 👌</button>
+        <button onclick="akuiPeringatan()">Oke 👌</button>
       </div>
     </div>
 
     <script>
-      // ========== STATE VARIABLES ==========
-      let emissionCount = 0;
-      let Updated = false;
-      let alertGiven = false;
-      let emissionHistory = [];
-      let prevScore = null;
-      const DEVIATION_LIMIT = 5; // Reduced from 10 for better responsiveness
-      let emissionChart = null;
-      let emissionDataByDay = {}; // Track emissiones by day
+      // ========== VARIABEL STATE ==========
+      let jumlahAsap = 0;
+      let sudahDiperbarui = false;
+      let sudahMemberiPeringatan = false;
+      let riwayatAsap = [];
+      let nilaiSebelumnya = null;
+      const BATAS_DEVIASI = 10; // Deviasi maksimal 10 ppm untuk deteksi perubahan mendadak
+      let grafikAsap = null;
+      let dataAsapPerHari = {}; // Melacak asap per hari
 
-      // ========== INITIALIZATION ==========
+      // ========== INISIALISASI ==========
       /**
-       * Initialize the emission chart on page load
+       * Inisialisasi grafik asap saat halaman dimuat
        */
       window.addEventListener("load", function () {
-        initializeEmissionChart();
+        inisialisasiGrafikAsap();
       });
 
       /**
-       * Initialize Chart.js for emission history visualization
+       * Inisialisasi Chart.js untuk visualisasi riwayat asap
        */
-      function initializeEmissionChart() {
-        // Wait for DOM to be ready
-        const canvasElement = document.getElementById("emissionChart");
-        if (!canvasElement) {
-          console.error("Canvas element not found. Retrying...");
-          setTimeout(initializeEmissionChart, 100);
+      function inisialisasiGrafikAsap() {
+        // Tunggu DOM siap
+        const elemenKanvas = document.getElementById("emissionChart");
+        if (!elemenKanvas) {
+          console.error("Elemen kanvas tidak ditemukan. Mencoba ulang...");
+          setTimeout(inisialisasiGrafikAsap, 100);
           return;
         }
 
-        const ctx = canvasElement.getContext("2d");
+        const ctx = elemenKanvas.getContext("2d");
         if (!ctx) {
-          console.error("Failed to get canvas context");
+          console.error("Gagal mendapatkan konteks kanvas");
           return;
         }
 
-        // Destroy existing chart if it exists
-        if (emissionChart) {
-          emissionChart.destroy();
+        // Hancurkan grafik yang ada
+        if (grafikAsap) {
+          grafikAsap.destroy();
         }
 
-        emissionChart = new Chart(ctx, {
+        grafikAsap = new Chart(ctx, {
           type: "bar",
           data: {
-            labels: getLastXDays(7),
+            labels: ambilXHariTerakhir(7),
             datasets: [
               {
                 label: "Data Jumlah Pelanggar KTR per Hari",
-                data: getEmissionDataForDays(7),
+                data: ambilDataAsapUntukHari(7),
                 backgroundColor: "#7b9e5e",
                 borderColor: "#6b8e4e",
                 borderWidth: 1,
@@ -1384,56 +1401,56 @@
           },
         });
 
-        console.log("Emission chart initialized successfully");
+        console.log("Grafik asap berhasil diinisialisasi");
       }
 
       /**
-       * Get last X days in format "Mon", "Tue", etc.
+       * Ambil X hari terakhir dalam format "Sen", "Sel", dll.
        */
-      function getLastXDays(count) {
-        const days = [];
-        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      function ambilXHariTerakhir(jumlah) {
+        const hari = [];
+        const namaNamaNama = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
-        for (let i = count - 1; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          days.push(dayNames[date.getDay()]);
+        for (let i = jumlah - 1; i >= 0; i--) {
+          const tanggal = new Date();
+          tanggal.setDate(tanggal.getDate() - i);
+          hari.push(namaNamaNama[tanggal.getDay()]);
         }
 
-        return days;
+        return hari;
       }
 
       /**
-       * Get emission data for last X days
+       * Ambil data asap untuk X hari terakhir
        */
-      function getEmissionDataForDays(count) {
+      function ambilDataAsapUntukHari(jumlah) {
         const data = [];
 
-        for (let i = count - 1; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const dateKey = date.toLocaleDateString();
-          data.push(emissionDataByDay[dateKey] || 0);
+        for (let i = jumlah - 1; i >= 0; i--) {
+          const tanggal = new Date();
+          tanggal.setDate(tanggal.getDate() - i);
+          const kunciTanggal = tanggal.toLocaleDateString();
+          data.push(dataAsapPerHari[kunciTanggal] || 0);
         }
 
         return data;
       }
 
       /**
-       * Update the emission chart with new data
+       * Perbarui grafik asap dengan data baru
        */
-      function updateEmissionChart() {
-        if (emissionChart) {
-          emissionChart.data.labels = getLastXDays(7);
-          emissionChart.data.datasets[0].data = getEmissionDataForDays(7);
-          emissionChart.update();
+      function perbaruiGrafikAsap() {
+        if (grafikAsap) {
+          grafikAsap.data.labels = ambilXHariTerakhir(7);
+          grafikAsap.data.datasets[0].data = ambilDataAsapUntukHari(7);
+          grafikAsap.update();
         }
       }
 
-      // ========== AUTHENTICATION ==========
+      // ========== OTENTIKASI ==========
       /**
-       * Form submission handler for user login
-       * Validates credentials and shows dashboard on success
+       * Penanganan pengiriman formulir untuk login pengguna
+       * Memvalidasi kredensial dan menampilkan dashboard saat berhasil
        */
       document
         .getElementById("userID")
@@ -1453,28 +1470,35 @@
             if (result.success) {
               document.getElementById("connectedSSID").textContent = ssid;
 
-              // Show success modal
+              // Tampilkan modal sukses
               document.getElementById("successModal").style.display = "flex";
               document.body.style.overflow = "hidden";
 
-              // Transition to dashboard after delay
+              // Lakukan transisi ke dashboard setelah delay
               setTimeout(() => {
                 document.getElementById("signin").style.display = "none";
                 document.getElementById("dashboard").style.display = "block";
                 document.getElementById("successModal").style.display = "none";
                 document.body.style.overflow = "auto";
                 
-                // Initialize chart on dashboard load
+                // Atur ulang flag update untuk memastikan alert bekerja segera
+                sudahDiperbarui = false;
+                sudahMemberiPeringatan = false;
+                
+                // Inisialisasi grafik saat dashboard dimuat
                 setTimeout(() => {
-                  initializeEmissionChart();
+                  inisialisasiGrafikAsap();
                 }, 100);
                 
-                load(); // Initial load
+                // Lakukan beberapa pemuatan segera untuk memastikan visibilitas data
+                muat(); // Pemuatan awal segera
+                setTimeout(() => muat(), 300); // Muat setelah 300ms
+                setTimeout(() => muat(), 600); // Muat setelah 600ms
               }, 1500);
             } else {
               const errorMsg = document.getElementById("errorMessage");
               errorMsg.textContent =
-                "❌ Incorrect credentials. Please try again.";
+                "❌ Kredensial salah. Silakan coba lagi.";
               errorMsg.style.display = "block";
 
               document.getElementById("ssid").value = "";
@@ -1482,19 +1506,19 @@
               document.getElementById("ssid").focus();
             }
           } catch (err) {
-            console.error("Login request failed:", err);
-            showConnectionError();
+            console.error("Permintaan login gagal:", err);
+            tampilkanGalatKoneksi();
           }
         });
 
-      // ========== POLLING AND DATA HANDLING ==========
+      // ========== POLLING DAN PENANGANAN DATA ==========
       /**
-       * Load air quality data from device and update UI
-       * Fetches AQI score from /aqi endpoint with improved delta calculation
+       * Muat data kepadatan asap dari perangkat dan perbarui UI
+       * Ambil skor kepadatan dari endpoint /kepadatan dengan perhitungan delta yang ditingkatkan
        */
-      async function load() {
+      async function muat() {
         try {
-          const r = await fetch("/aqi");
+          const r = await fetch("/kepadatan");
           const d = await r.json();
           const s = parseFloat(d.score);
 
@@ -1502,92 +1526,142 @@
           const st = document.getElementById("statusText");
           el.textContent = s.toFixed(2);
 
-          // Detect rapid increases in smoke levels
-          let spikeAlert = false;
+          // Deteksi lonjakan cepat di level asap
+          let peringatanLonjakan = false;
 
-          if (prevScore !== null) {
-            spikeAlert = s - prevScore > DEVIATION_LIMIT;
+          if (nilaiSebelumnya !== null) {
+            peringatanLonjakan = s - nilaiSebelumnya > BATAS_DEVIASI;
           }
 
-          // Show warning for rapid spikes
-          if (spikeAlert && !alertGiven) {
-            showWarning();
-            alertGiven = true;
+          // Tampilkan peringatan untuk lonjakan cepat
+          if (peringatanLonjakan && !sudahMemberiPeringatan) {
+            tampilkanPeringatan();
+            sudahMemberiPeringatan = true;
           } else {
-            alertGiven = false;
+            sudahMemberiPeringatan = false;
           }
 
-          // Determine air quality status and update UI
-          if (s <= 40) {
-            // Safe air quality
+          // Tentukan status kualitas asap - 3 kondisi sederhana:
+          // 1. ≤35 ppm: AMAN
+          // 2. 35-50 ppm: NOTIF (kualitas mungkin buruk, tanpa pencatatan)
+          // 3. >50 ppm: ALERT (pencatatan pelanggaran KTR)
+          if (s <= 35) {
+            // Kondisi 1: Aman - tidak ada asap terdeteksi
             el.style.color = "#7b9e5e";
             st.textContent =
-              "✅ Tidak ada asap rokok terdeteksi.";
-            Updated = false;
-          } else if (s <= 60) {
-            // Moderate air quality
+              "✅ Udara bersih - Tidak ada asap terdeteksi.";
+            sudahDiperbarui = false;
+          } else if (s <= 50) {
+            // Kondisi 2: Notifikasi - kualitas mungkin buruk
             el.style.color = "#c9a961";
             st.textContent =
-              "⚠️ Asap pada udara terdeteksi. Terdapat indikasi asap rokok";
-            Updated = false;
+              "⚠️ Kualitas udara mungkin buruk - Asap terdeteksi.";
+            if (!sudahDiperbarui) {
+              // Tampilkan notifikasi toast saat masuk kondisi notif
+              tampilkanNotifikasi("⚠️ Perhatian: Kualitas udara mungkin buruk", "warning");
+              sudahDiperbarui = true;
+            }
           } else {
-            // Poor/dangerous air quality
+            // Kondisi 3: Alert penuh - pencatatan otomatis
             el.style.color = "#d4543f";
             st.textContent =
-              "🚨 Asap rokok terdeteksi. Lakukan Pengecekan Segera";
-            if (!Updated) {
-              // Record emission event with timestamp
-              emissionCount++;
-              const now = new Date();
-              const timestamp =
-                now.toLocaleDateString() + " " + now.toLocaleTimeString();
-              const dateKey = now.toLocaleDateString();
+              "🚨 ASAP ROKOK TERDETEKSI - Pencatatan pelanggaran KTR!";
+            if (!sudahDiperbarui) {
+              // Catat peristiwa asap dengan stempel waktu
+              jumlahAsap++;
+              const sekarang = new Date();
+              const stempelWaktu =
+                sekarang.toLocaleDateString() + " " + sekarang.toLocaleTimeString();
+              const kunciTanggal = sekarang.toLocaleDateString();
 
-              emissionHistory.push(timestamp);
-              emissionDataByDay[dateKey] =
-                (emissionDataByDay[dateKey] || 0) + 1;
+              riwayatAsap.push(stempelWaktu);
+              dataAsapPerHari[kunciTanggal] =
+                (dataAsapPerHari[kunciTanggal] || 0) + 1;
 
-              updateEmissionChart();
-              showAlert();
-              Updated = true;
+              perbaruiGrafikAsap();
+              tampilkanPeringatanAsap();
+              sudahDiperbarui = true;
             }
           }
 
-          // Store current reading for next delta calculation
-          prevScore = s;
+          // Simpan pembacaan saat ini untuk perhitungan delta berikutnya
+          nilaiSebelumnya = s;
 
-          document.getElementById("emission").textContent = emissionCount;
+          document.getElementById("emission").textContent = jumlahAsap;
           document.getElementById("emissionText").textContent =
-            emissionCount > 0
-              ? `${emissionCount} smoke emission${emissionCount !== 1 ? "es" : ""} detected!`
+            jumlahAsap > 0
+              ? `${jumlahAsap} kelompok${jumlahAsap !== 1 ? " asap" : " asap"} terdeteksi!`
               : "Tidak ada asap rokok terdeteksi.";
 
-          // Update timestamp
+          // Perbarui status kalibrasi
+          perbaruiStatusKalibrasi();
+
+          // Perbarui stempel waktu
           document.getElementById("time").textContent =
             new Date().toLocaleTimeString();
         } catch (e) {
-          // Device is offline
+          // Perangkat offline
           document.getElementById("statusText").textContent =
-            "📵 Device offline";
-          console.error("Fetch error:", e);
+            "📵 Perangkat offline";
+          console.error("Kesalahan fetch:", e);
         }
       }
 
-      // ========== UI INTERACTIONS ==========
       /**
-       * Display emission history modal with detailed log
+       * Fetch dan perbarui status kalibrasi dari API
        */
-      function showEmissionHistory() {
+      async function perbaruiStatusKalibrasi() {
+        try {
+          const response = await fetch("/status-kalibrasi");
+          const data = await response.json();
+          
+          const statusEl = document.getElementById("calibrationStatus");
+          const statusTexts = {
+            "Siap": "✅ Status Kalibrasi: Siap",
+            "Sedang...": "⏳ Status Kalibrasi: Sedang berlangsung...",
+            "Gagal": "❌ Status Kalibrasi: Gagal"
+          };
+          
+          let statusDisplay = statusTexts[data.status] || `Status Kalibrasi: ${data.status}`;
+          
+          // Tambahkan informasi Ro jika tersedia
+          if (data.calibrated && data.ro > 0) {
+            statusDisplay += ` (Ro: ${data.ro.toFixed(0)} Ω)`;
+          }
+          
+          statusEl.textContent = statusDisplay;
+          
+          // Update warna berdasarkan status
+          if (data.status === "Siap" && data.calibrated) {
+            statusEl.style.background = "rgba(123, 158, 94, 0.1)";
+            statusEl.style.color = "#7b9e5e";
+          } else if (data.status === "Sedang...") {
+            statusEl.style.background = "rgba(201, 169, 97, 0.1)";
+            statusEl.style.color = "#c9a961";
+          } else if (data.status === "Gagal") {
+            statusEl.style.background = "rgba(212, 84, 63, 0.1)";
+            statusEl.style.color = "#d4543f";
+          }
+        } catch (e) {
+          console.error("Kesalahan fetch status kalibrasi:", e);
+        }
+      }
+
+      // ========== INTERAKSI UI ==========
+      /**
+       * Tampilkan modal riwayat asap dengan log detail
+       */
+      function tampilkanRiwayatAsap() {
         const list = document.getElementById("emissionList");
         list.innerHTML = "";
 
-        if (emissionHistory.length === 0) {
+        if (riwayatAsap.length === 0) {
           const li = document.createElement("li");
-          li.textContent = "No emission events recorded yet.";
+          li.textContent = "Belum ada peristiwa asap yang tercatat.";
           list.appendChild(li);
         } else {
-          // Display in reverse chronological order
-          emissionHistory
+          // Tampilkan dalam urutan kronologis terbalik
+          riwayatAsap
             .slice()
             .reverse()
             .forEach((entry) => {
@@ -1601,82 +1675,82 @@
       }
 
       /**
-       * Close emission history modal
+       * Tutup modal riwayat asap
        */
-      function closeEmissionHistory() {
+      function tutupRiwayatAsap() {
         document.getElementById("emissionHistory").style.display = "none";
       }
 
       /**
-       * Reset emission counter and history
+       * Atur ulang penghitung asap dan riwayat
        */
-      function resetEmissionCount() {
+      function aturUlangJumlahAsap() {
         if (
           confirm(
-            "Are you sure you want to reset the emission counter? This cannot be undone.",
+            "Apakah Anda yakin ingin mengatur ulang penghitung asap? Tindakan ini tidak dapat dibatalkan.",
           )
         ) {
-          emissionCount = 0;
-          emissionHistory = [];
-          emissionDataByDay = {};
+          jumlahAsap = 0;
+          riwayatAsap = [];
+          dataAsapPerHari = {};
 
           document.getElementById("emission").textContent = "0";
           document.getElementById("emissionText").textContent =
             "Tidak ada asap rokok terdeteksi.";
           document.getElementById("emissionList").innerHTML = "";
 
-          updateEmissionChart();
+          perbaruiGrafikAsap();
 
-          showNotification("✓ Data berhasil terhapus", "success");
+          tampilkanNotifikasi("✓ Data berhasil terhapus", "success");
         }
       }
 
       /**
-       * Show full-screen smoke detection alert modal
+       * Tampilkan modal peringatan deteksi asap layar penuh
        */
-      function showAlert() {
+      function tampilkanPeringatanAsap() {
         document.getElementById("alertOverlay").style.display = "flex";
         document.body.style.overflow = "hidden";
 
-        // Auto-dismiss after 5 seconds
+        // Tutup otomatis setelah 5 detik
         setTimeout(() => {
-          acknowledgeAlert();
+          akuiPeringatan();
         }, 5000);
       }
 
       /**
-       * Close alert modal
+       * Tutup modal peringatan
        */
-      function acknowledgeAlert() {
+      function akuiPeringatan() {
         document.getElementById("alertOverlay").style.display = "none";
         document.body.style.overflow = "auto";
       }
 
       /**
-       * Show connection error modal
+       * Tampilkan modal galat koneksi
        */
-      function showConnectionError() {
+      function tampilkanGalatKoneksi() {
         document.getElementById("connectionErrorModal").style.display = "flex";
         document.body.style.overflow = "hidden";
       }
 
       /**
-       * Close connection error modal
+       * Tutup modal galat koneksi
        */
-      function closeConnectionError() {
+      function tutupGalatKoneksi() {
         document.getElementById("connectionErrorModal").style.display = "none";
         document.body.style.overflow = "auto";
       }
 
       /**
-       * Show toast notification for rapid air quality changes
-       * Displays elegant notification at top-right of screen
+       * Tampilkan notifikasi toast untuk perubahan kepadatan asap yang cepat
+       * Menampilkan notifikasi elegan di pojok kanan atas layar
        */
-      function showWarning() {
+      function tampilkanPeringatan() {
         const toast = document.createElement("div");
         toast.className = "toast";
         toast.innerHTML = `
-          <strong>⚠️ Peringatan!</strong> Kandungan asap rokok di udara meningkat drastis. Kepadatan asap meningkat ${Math.round((prevScore || 0) + DEVIATION_LIMIT)}%.
+          <strong>⚠️ Perubahan Mendadak!</strong> Kepadatan asap melonjak dengan cepat.
         `;
 
         document.body.appendChild(toast);
@@ -1684,13 +1758,13 @@
         setTimeout(() => {
           toast.classList.add("fade-out");
           setTimeout(() => toast.remove(), 300);
-        }, 6000);
+        }, 4000);
       }
 
       /**
-       * Show generic notification toast
+       * Tampilkan notifikasi toast generik
        */
-      function showNotification(message, type = "info") {
+      function tampilkanNotifikasi(message, type = "info") {
         const toast = document.createElement("div");
         toast.className = "toast";
         toast.textContent = message;
@@ -1701,6 +1775,9 @@
         } else if (type === "error") {
           toast.style.borderLeftColor = "#d4543f";
           toast.style.color = "#d4543f";
+        } else if (type === "warning") {
+          toast.style.borderLeftColor = "#c9a961";
+          toast.style.color = "#c9a961";
         }
 
         document.body.appendChild(toast);
@@ -1711,9 +1788,9 @@
         }, 5000);
       }
 
-      // ========== MAIN LOOP ==========
-      // Poll device every 1 second for AQI updates
-      setInterval(load, 1000);
+      // ========== LOOP UTAMA ==========
+      // Polling perangkat setiap 1 detik untuk update kepadatan asap
+      setInterval(muat, 1000);
     </script>
   </body>
 </html>

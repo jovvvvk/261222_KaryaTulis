@@ -1,15 +1,15 @@
 /**
  * @file wifi_server.cpp
- * @brief WiFi server implementation for Kelompok 14 - Smoke Detector Prototype
+ * @brief Implementasi server WiFi untuk Kelompok 14 - Purwarupa Alat Pendeteksi Asap Rokok
  * 
- * Provides REST API endpoints for:
- * - Device status (/status)
- * - User authentication (/login)
- * - Air quality monitoring (/aqi)
- * - Web interface serving (/)
+ * Menyediakan endpoint REST API untuk:
+ * - Status perangkat (/status)
+ * - Autentikasi pengguna (/login)
+ * - Pemantauan kepadatan asap (/kepadatan)
+ * - Melayani antarmuka web (/)
  * 
- * Uses LittleFS for serving static web files and ArduinoJson for JSON serialization.
- * All endpoints are documented with their expected request/response formats.
+ * Menggunakan LittleFS untuk melayani file web statis dan ArduinoJson untuk serialisasi JSON.
+ * Semua endpoint didokumentasikan dengan format permintaan/respons yang diharapkan.
  */
 
 #include "wifi_server.h"
@@ -19,54 +19,63 @@
 #include <ArduinoJson.h>
 #include <LittleFS.h>
 
-// External variable for air quality reading from main.cpp
-extern float airQuality;
+// Variabel eksternal untuk pembacaan kepadatan asap dari main.cpp
+extern float kepadatanAsap;
+
+/** @brief Variabel eksternal untuk status kalibrasi dari main.cpp */
+extern String statusKalibrasi;
+
+/** @brief Variabel eksternal untuk nilai Ro (resistansi sensor di udara bersih) dari main.cpp */
+extern float nilaiRo;
+
+/** @brief Variabel eksternal untuk flag kalibrasi selesai dari main.cpp */
+extern bool sudahKalibrasi;
 
 /**
- * @brief Constructor - Initialize server with port number
- * @param port HTTP server port (default: 80)
+ * @brief Konstruktor - Inisialisasi server dengan nomor port
+ * @param port Port server HTTP (default: 80)
  */
-DeviceServer::DeviceServer(uint16_t port) : server(port) {}
+ServerPerangkat::ServerPerangkat(uint16_t port) : server(port) {}
 
 /**
- * @brief Initialize WiFi access point and HTTP endpoints
- * Sets up WiFi AP, initializes LittleFS, and registers all API endpoints.
- * @return true if setup successful, false on failure
+ * @brief Inisialisasi titik akses WiFi dan endpoint HTTP
+ * Menyiapkan WiFi AP, menginisialisasi LittleFS, dan mendaftarkan semua endpoint API.
+ * @return true jika penyiapan berhasil, false jika gagal
  */
-bool DeviceServer::begin() {
-    // Initialize LittleFS filesystem for web files
+bool ServerPerangkat::begin() {
+    // Inisialisasi filesystem LittleFS untuk file web
     if (!LittleFS.begin()) {
-        Serial.println("[ERROR] Failed to mount LittleFS!");
+        Serial.println("[ERROR] Gagal mount LittleFS!");
         return false;
     }
     
-    // Start WiFi in Access Point mode
+    // Mulai WiFi dalam mode Access Point
     WiFi.mode(WIFI_AP);
-    if (!WiFi.softAP(ssid, password)) {
-        Serial.println("[ERROR] Failed to start WiFi AP!");
+    if (!WiFi.softAP(ssid, kataSandi)) {
+        Serial.println("[ERROR] Gagal memulai WiFi AP!");
         return false;
     }
     
-    // Store and report IP address
+    // Simpan dan laporkan alamat IP
     IP = WiFi.softAPIP();
-    Serial.print("[INFO] WiFi AP started. IP address: ");
+    Serial.print("[INFO] WiFi AP dimulai. Alamat IP: ");
     Serial.println(IP);
 
-    // Initialize mDNS with hostname "kelompok14"
-    // Users can access the device at http://kelompok14.local
+    // Inisialisasi mDNS dengan hostname "kelompok14"
+    // Pengguna dapat mengakses perangkat di http://kelompok14.local
     if (!MDNS.begin("kelompok14")) {
-        Serial.println("[WARNING] mDNS initialization failed!");
-        Serial.println("[INFO] Device will still be accessible via http://192.168.4.1");
+        Serial.println("[WARNING] Inisialisasi mDNS gagal!");
+        Serial.println("[INFO] Perangkat tetap dapat diakses via http://192.168.4.1");
     } else {
-        Serial.println("[INFO] mDNS responder started. Access at: http://kelompok14.local");
-        // Add service description (optional)
+        Serial.println("[INFO] Responder mDNS dimulai. Akses di: http://kelompok14.local");
+        // Tambahkan deskripsi layanan (opsional)
         MDNS.addService("http", "tcp", 80);
     }
 
     // ========== ENDPOINT: /status (GET) ==========
     /**
-     * Returns device status information
-     * Response: {"ip": "192.168.4.1", "rssi": -45}
+     * Mengembalikan informasi status perangkat
+     * Respons: {"ip": "192.168.4.1", "rssi": -45}
      */
     server.on("/status", HTTP_GET, [this]() {
         JsonDocument doc;
@@ -80,71 +89,90 @@ bool DeviceServer::begin() {
 
     // ========== ENDPOINT: /login (POST) ==========
     /**
-     * Authenticates user credentials against allowedUsers array
-     * Request: {"ssid": "username", "pass": "password"}
-     * Response: {"success": true} or {"success": false}
+     * Mengautentikasi kredensial pengguna terhadap daftar penggunaTerauthorisasi
+     * Permintaan: {"ssid": "nama_pengguna", "pass": "kata_sandi"}
+     * Respons: {"success": true} atau {"success": false}
      */
     server.on("/login", HTTP_POST, [this]() {
         if (server.hasArg("plain")) {
             JsonDocument doc;
             DeserializationError err = deserializeJson(doc, server.arg("plain"));
 
-            // Return error if JSON is malformed
+            // Kembalikan error jika JSON tidak valid
             if (err) {
-                Serial.println("[ERROR] Invalid JSON in login request");
-                server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+                Serial.println("[ERROR] JSON tidak valid dalam permintaan login");
+                server.send(400, "application/json", "{\"error\":\"JSON Tidak Valid\"}");
                 return;
             }
 
-            // Extract credentials from JSON payload
+            // Ekstrak kredensial dari payload JSON
             const char* inputSSID = doc["ssid"];
             const char* inputPass = doc["pass"];
 
-            // Check credentials against authorized users
-            bool authenticated = false;
-            for (size_t i = 0; i < allowedUserCount; i++) {
+            // Periksa kredensial terhadap pengguna yang diizinkan
+            bool terautentikasi = false;
+            for (size_t i = 0; i < jumlahPenggunaTerauthorisasi; i++) {
                 if (inputSSID && inputPass &&
-                    strcmp(inputSSID, allowedUsers[i].user) == 0 &&
-                    strcmp(inputPass, allowedUsers[i].pass) == 0) {
-                    authenticated = true;
-                    Serial.print("[INFO] User authenticated: ");
+                    strcmp(inputSSID, penggunaTerauthorisasi[i].pengguna) == 0 &&
+                    strcmp(inputPass, penggunaTerauthorisasi[i].kataSandi) == 0) {
+                    terautentikasi = true;
+                    Serial.print("[INFO] Pengguna terautentikasi: ");
                     Serial.println(inputSSID);
                     break;
                 }
             }
 
-            // Return authentication result
+            // Kembalikan hasil autentikasi
             server.send(
                 200,
                 "application/json",
-                authenticated ? "{\"success\":true}" : "{\"success\":false}"
+                terautentikasi ? "{\"success\":true}" : "{\"success\":false}"
             );
         } 
         else {
-            Serial.println("[ERROR] No body in login request");
-            server.send(400, "application/json", "{\"error\":\"Bad Request\"}");
+            Serial.println("[ERROR] Tidak ada body dalam permintaan login");
+            server.send(400, "application/json", "{\"error\":\"Permintaan Buruk\"}");
         }
     });
 
-    // ========== ENDPOINT: /aqi (GET) ==========
+    // ========== ENDPOINT: /kepadatan (GET) ==========
     /**
-     * Returns current air quality index score
-     * Response: {"score": 45.5}
-     * Score range: 0-100 (0=clean, 100=dangerous)
+     * Mengembalikan skor kepadatan asap saat ini
+     * Respons: {"score": 450.5}
+     * Range score: 0-1000 (0=bersih, 1000=berbahaya)
      */
-    server.on("/aqi", HTTP_GET, [this]() {
+    server.on("/kepadatan", HTTP_GET, [this]() {
         JsonDocument doc;
-        doc["score"] = airQuality;
+        doc["score"] = kepadatanAsap;
         
         char buffer[64];
         serializeJson(doc, buffer);
         server.send(200, "application/json", buffer);
     });
 
+    // ========== ENDPOINT: /status-kalibrasi (GET) ==========
+    /**
+     * Mengembalikan status kalibrasi sensor
+     * Respons: {"status": "Siap", "ro": 10234.56, "calibrated": true}
+     * status: "Sedang...", "Siap", "Gagal", dll
+     * ro: Nilai resistansi baseline di udara bersih (Ohm)
+     * calibrated: Flag boolean apakah kalibrasi sudah selesai
+     */
+    server.on("/status-kalibrasi", HTTP_GET, [this]() {
+        JsonDocument doc;
+        doc["status"] = statusKalibrasi;
+        doc["ro"] = nilaiRo;
+        doc["calibrated"] = sudahKalibrasi;
+        
+        char buffer[128];
+        serializeJson(doc, buffer);
+        server.send(200, "application/json", buffer);
+    });
+
     // ========== ENDPOINT: / (GET) ==========
     /**
-     * Serves web interface (index.html) from LittleFS filesystem
-     * Displays responsive dashboard for air quality monitoring
+     * Melayani antarmuka web (index.html) dari filesystem LittleFS
+     * Menampilkan dashboard responsif untuk pemantauan kepadatan asap
      */
     server.on("/", HTTP_GET, [this]() {
         if (LittleFS.exists("/index.html")) {
@@ -152,18 +180,18 @@ bool DeviceServer::begin() {
             server.streamFile(file, "text/html");
             file.close();
         } else {
-            Serial.println("[ERROR] index.html not found in LittleFS");
-            server.send(404, "text/plain", "index.html not found");
+            Serial.println("[ERROR] index.html tidak ditemukan di LittleFS");
+            server.send(404, "text/plain", "index.html tidak ditemukan");
         }
     });
 
-    // ========== STATIC FILE SERVING (Images, CSS, etc) ==========
+    // ========== PELAYANAN FILE STATIS (Gambar, CSS, dll) ==========
     /**
-     * Serves static files from LittleFS filesystem
-     * Supports: .jpg, .png, .gif, .css, .js, .woff, .woff2, .svg formats
-     * Automatically detects MIME type based on file extension
+     * Melayani file statis dari filesystem LittleFS
+     * Mendukung: format .jpg, .png, .gif, .css, .js, .woff, .woff2, .svg
+     * Secara otomatis mendeteksi MIME type berdasarkan ekstensi file
      */
-    // Serve static files (js, jpg, css, etc.) from LittleFS
+    // Layani file statis (js, jpg, css, dll.) dari LittleFS
         server.onNotFound([this]() {
         String path = server.uri();
 
@@ -182,28 +210,28 @@ bool DeviceServer::begin() {
             file.close();
             return;}
 
-    Serial.print("[WARN] File not found: ");
+    Serial.print("[WARN] File tidak ditemukan: ");
     Serial.println(path);
-    server.send(404, "application/json", "{\"error\":\"Not found\"}");
+    server.send(404, "application/json", "{\"error\":\"Tidak Ditemukan\"}");
 });
 
-    // Start the web server
+    // Mulai web server
     server.begin();
-    Serial.println("[INFO] HTTP server started on port 80");
+    Serial.println("[INFO] Server HTTP dimulai di port 80");
     return true;
 }
 
 /**
- * @brief Process incoming HTTP requests
- * Should be called repeatedly in main loop to handle client requests.
- * Non-blocking call that processes pending requests.
+ * @brief Proses permintaan HTTP masuk
+ * Harus dipanggil berulang kali di main loop untuk menangani permintaan klien.
+ * Pemanggilan non-blocking yang memproses permintaan yang tertunda.
  */
-void DeviceServer::handle() {
+void ServerPerangkat::handle() {
     server.handleClient();
 }
 
 /**
- * @brief Destructor
- * Cleans up server resources (if needed)
+ * @brief Destruktor
+ * Membersihkan resources server (jika diperlukan)
  */
-DeviceServer::~DeviceServer() {}
+ServerPerangkat::~ServerPerangkat() {}

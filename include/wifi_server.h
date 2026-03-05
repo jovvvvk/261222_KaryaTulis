@@ -1,32 +1,32 @@
 /**
  * @file wifi_server.h
- * @brief WiFi server implementation for Kelompok 14 - Smoke Detector Prototype
+ * @brief Implementasi server WiFi Kelompok 14 - Purwarupa Alat Pendeteksi Asap Rokok
  * 
- * Provides REST API endpoints for device status, user authentication,
- * and air quality index (AQI) monitoring with web dashboard interface.
- * Serves static files (images, CSS) from LittleFS filesystem using SPIFFS.
+ * Menyediakan endpoint REST API untuk status perangkat, autentikasi pengguna,
+ * dan pemantauan indeks kepadatan asap (dalam satuan ppm) dengan antarmuka dashboard web.
+ * Melayani file statis (gambar, CSS) dari filesystem LittleFS menggunakan SPIFFS.
  * 
- * API Endpoints:
- * - GET  /                  → Serve web interface (index.html)
- * - GET  /status            → Device status (IP, RSSI)
- * - GET  /aqi               → Air quality reading (0-100%)
- * - POST /login             → User authentication
- * - GET  /greflex.jpg       → Logo image 1 from SPIFFS
- * - GET  /gonzaga.jpg       → Logo image 2 from SPIFFS
- * - GET  /<any_static_file> → Serve static files from LittleFS (auto MIME type)
+ * Endpoint API:
+ * - GET  /                  → Melayani antarmuka web (index.html)
+ * - GET  /status            → Status perangkat (IP, RSSI)
+ * - GET  /kepadatan         → Pembacaan kepadatan asap (0-1000 ppm)
+ * - POST /login             → Autentikasi pengguna
+ * - GET  /greflex.jpg       → Gambar logo 1 dari LittleFS
+ * - GET  /gonzaga.jpg       → Gambar logo 2 dari LittleFS
+ * - GET  /<berkas_statis>   → Melayani file statis dari LittleFS (MIME type otomatis)
  * 
- * SPIFFS File Structure:
+ * Struktur File LittleFS:
  * ```
  * data/
- * ├── index.html           (Web interface)
- * ├── greflex.jpg          (Logo 1 - must be added to data/ folder)
- * └── gonzaga.jpg          (Logo 2 - must be added to data/ folder)
+ * ├── index.html           (Antarmuka web)
+ * ├── greflex.jpg          (Logo 1 - harus ditambahkan ke folder data/)
+ * └── gonzaga.jpg          (Logo 2 - harus ditambahkan ke folder data/)
  * ```
  * 
- * To add logo images:
- * 1. Place greflex.jpg and gonzaga.jpg in the data/ folder
- * 2. Upload filesystem with: platformio run --target uploadfs
- * 3. Access logos at: http://kelompok14.local/greflex.jpg or http://192.168.4.1/greflex.jpg
+ * Untuk menambahkan gambar logo:
+ * 1. Letakkan greflex.jpg dan gonzaga.jpg di folder data/
+ * 2. Upload filesystem dengan: platformio run --target uploadfs
+ * 3. Akses logo di: http://kelompok14.local/greflex.jpg atau http://192.168.4.1/greflex.jpg
  */
 
 #ifndef WIFI_SERVER_H
@@ -36,89 +36,89 @@
 #include <IPAddress.h>
 #include <ESPmDNS.h>
 
-/** @brief Global air quality reading from sensor (0-100%) */
-extern float airQuality;
+/** @brief Pembacaan kepadatan asap global dari sensor (0-1000 ppm) */
+extern float kepadatanAsap;
 
 /**
- * @struct user_data
- * @brief Stores username and password for device authentication
+ * @struct data_pengguna
+ * @brief Menyimpan nama pengguna dan kata sandi untuk autentikasi perangkat
  * 
- * Used for HTTP Basic Auth on /login endpoint
+ * Digunakan untuk HTTP Basic Auth pada endpoint /login
  */
-struct user_data {
-    const char* user;  /**< Username for authentication */
-    const char* pass;  /**< Password for authentication */
+struct data_pengguna {
+    const char* pengguna;  /**< Nama pengguna untuk autentikasi */
+    const char* kataSandi;  /**< Kata sandi untuk autentikasi */
 };
 
-/** @brief Array of authorized users for WiFi access control */
-const user_data allowedUsers[] = {
+/** @brief Daftar pengguna yang diizinkan untuk kontrol akses WiFi */
+const data_pengguna penggunaTerauthorisasi[] = {
     { "Gonzaga", "12345"}
 };
 
 /**
- * @class DeviceServer
- * @brief Manages WiFi server and REST API for device monitoring
+ * @class ServerPerangkat
+ * @brief Mengelola server WiFi dan REST API untuk pemantauan perangkat
  * 
- * Handles:
- * - WiFi access point (AP) setup with mDNS support (kelompok14.local)
- * - User authentication against allowed credentials
- * - REST API endpoints for device status and air quality
- * - Static file serving from LittleFS (images, CSS, etc with auto MIME type detection)
- * - Automatic file caching headers for browser optimization
+ * Menangani:
+ * - Penyiapan titik akses WiFi (AP) dengan dukungan mDNS (kelompok14.local)
+ * - Autentikasi pengguna terhadap kredensial yang diizinkan
+ * - Endpoint REST API untuk status perangkat dan kepadatan asap
+ * - Melayani file statis dari LittleFS (gambar, CSS, dll dengan deteksi MIME type otomatis)
+ * - Header cache file otomatis untuk optimasi browser
  * 
- * Features:
- * - mDNS: Accessible at http://kelompok14.local from any device on the network
- * - Fallback: Accessible at http://192.168.4.1 if mDNS unavailable
- * - Static files: Served with proper MIME types (.jpg, .png, .css, .js, .svg, .woff, .woff2)
- * - Browser caching: 24-hour cache-control headers for static files
+ * Fitur:
+ * - mDNS: Dapat diakses di http://kelompok14.local dari perangkat manapun di jaringan
+ * - Fallback: Dapat diakses di http://192.168.4.1 jika mDNS tidak tersedia
+ * - File statis: Dilayani dengan MIME type yang tepat (.jpg, .png, .css, .js, .svg, .woff, .woff2)
+ * - Cache browser: Header cache-control 24-jam untuk file statis
  * 
- * Usage:
+ * Penggunaan:
  * ```cpp
- * DeviceServer wifi(80);  // Create on port 80
- * wifi.begin();           // Initialize WiFi and HTTP server
+ * ServerPerangkat wifi(80);  // Buat di port 80
+ * wifi.begin();              // Inisialisasi WiFi dan server HTTP
  * 
- * // In main loop:
- * wifi.handle();          // Process incoming requests and update mDNS
+ * // Di main loop:
+ * wifi.handle();             // Proses permintaan masuk dan perbarui mDNS
  * ```
  */
-class DeviceServer {
-    const char* ssid = "Kelompok 14 - Alat Pendeteksi Asap Rokok";        /**< WiFi SSID (network name) */
-    const char* password = "kelompok14";  /**< WiFi password */
-    WebServer server;                    /**< Web server instance */
-    IPAddress IP;                        /**< Device IP address */
+class ServerPerangkat {
+    const char* ssid = "Kelompok 14 - Alat Pendeteksi Asap Rokok";        /**< SSID WiFi (nama jaringan) */
+    const char* kataSandi = "kelompok14";  /**< Kata sandi WiFi */
+    WebServer server;                    /**< Instansi web server */
+    IPAddress IP;                        /**< Alamat IP perangkat */
     
     public:
     /**
-     * @brief Constructor
-     * @param port Server port number (default: 80 for HTTP)
+     * @brief Konstruktor
+     * @param port Nomor port server (default: 80 untuk HTTP)
      */
-    DeviceServer(uint16_t port);
+    ServerPerangkat(uint16_t port);
     
     /**
-     * @brief Initialize WiFi and HTTP server
+     * @brief Inisialisasi WiFi dan server HTTP
      * 
-     * Steps:
-     * 1. Mount LittleFS filesystem
-     * 2. Start WiFi in AP mode
-     * 3. Register API endpoints
-     * 4. Start web server
+     * Langkah-langkah:
+     * 1. Mount filesystem LittleFS
+     * 2. Mulai WiFi dalam mode AP
+     * 3. Daftarkan endpoint API
+     * 4. Mulai web server
      * 
-     * @return true if successful, false on failure
+     * @return true jika sukses, false jika gagal
      */
     bool begin();
     
     /**
-     * @brief Handle incoming client requests
-     * Should be called repeatedly in main loop.
-     * Non-blocking call that processes pending HTTP requests.
+     * @brief Tangani permintaan klien masuk
+     * Harus dipanggil berulang kali di main loop.
+     * Pemanggilan non-blocking yang memproses permintaan HTTP yang tertunda.
      */
     void handle();
     
-    /** @brief Number of authorized users in allowedUsers array */
-    const size_t allowedUserCount = sizeof(allowedUsers) / sizeof(allowedUsers[0]);
+    /** @brief Jumlah pengguna yang diizinkan dalam daftar penggunaTerauthorisasi */
+    const size_t jumlahPenggunaTerauthorisasi = sizeof(penggunaTerauthorisasi) / sizeof(penggunaTerauthorisasi[0]);
     
-    /** @brief Destructor - Cleans up resources */
-    ~DeviceServer();
+    /** @brief Destruktor - Membersihkan resources */
+    ~ServerPerangkat();
 };
 
 #endif
