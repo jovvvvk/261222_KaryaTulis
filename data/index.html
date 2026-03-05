@@ -25,9 +25,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Kelompok 14 - Smoke Detector Prototype with real-time monitoring"
+      content="Kelompok 14 - Sistem Pendeteksi Asap Rokok Berbasis IoT"
     />
-    <title>Kelompok 14 - Smoke Detector Prototype</title>
+    <title>Kelompok 14 - Purwarupa Alat Pendeteksi Asap Rokok Berbasis IoT</title>
 
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
@@ -1074,7 +1074,7 @@
         <div class="logo" title="Logo Gonzaga"><img src="/gonzaga.jpg" alt="Gonzaga"></div>
       </div>
       <div class="header-title">
-        <h1>Kelompok 14: Smart Smoke Detector</h1>
+        <h1>Purwarupa <i>(Prototype)</i> Produk Kelompok 14</h1>
         <h2>Sistem Pendeteksi Asap Rokok Berbasis IoT</h2>
       </div>
     </div>
@@ -1100,8 +1100,8 @@
         <!-- Success Modal -->
         <div id="successModal" class="alert-overlay">
           <div class="alert-box">
-            <h2 style="color: var(--primary-green)">Connected Successfully</h2>
-            <p>Your device is now connected and ready for monitoring.</p>
+            <h2 style="color: var(--primary-green)">Tersambung</h2>
+            <p>Alat siap untuk mendeteksi asap</p>
           </div>
         </div>
 
@@ -1111,9 +1111,9 @@
             type="text"
             id="ssid"
             name="ssid"
-            placeholder="Enter your username"
+            placeholder="Masukkan nama pengguna: (Gonzaga)"
             required
-            autocomplete="username"
+            autocomplete="username" 
           />
 
           <label for="password">Password</label>
@@ -1121,7 +1121,7 @@
             type="password"
             id="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="Masukkan kata sandi: (12345)"
             required
             autocomplete="current-password"
           />
@@ -1138,14 +1138,14 @@
         <div class="dashboard-container">
           <div class="container">
           <div class="dashboard-header">
-            <h1>Monitoring Dashboard</h1>
+            <h1>Papan Pemantauan</h1>
             <div class="header-status">
               <div class="status-item">
-                <span class="label">Connected to:</span>
+                <span class="label">Tersambung: </span>
                 <span class="value" id="connectedSSID">--</span>
               </div>
               <div class="status-item">
-                <span class="label">Last Update:</span>
+                <span class="label">Diperbarui:</span>
                 <span class="value" id="time">--:--</span>
               </div>
             </div>
@@ -1154,7 +1154,7 @@
           <div class="grid">
             <!-- Current Gas Density Section -->
             <div class="section">
-              <h3>📊 Real-time Gas Density</h3>
+              <h3>Kepadatan Asap</h3>
               <div class="metric-display">
                 <div class="aqi-score" id="score">0</div>
                 <div
@@ -1164,7 +1164,7 @@
                     margin-top: 8px;
                   "
                 >
-                  % Concentration
+                  % (dalam persentase)
                 </div>
               </div>
               <p class="status-text" id="statusText">Waiting for sensor data...</p>
@@ -1172,7 +1172,7 @@
 
             <!-- Smoke Emission Count Section -->
             <div class="section">
-              <h3>🚨 Emission Detection</h3>
+              <h3>🚬 Deteksi Asap Rokok</h3>
               <div class="metric-display">
                 <div class="emission-count" id="emission">0</div>
                 <div
@@ -1182,14 +1182,14 @@
                     margin-top: 8px;
                   "
                 >
-                  Events Detected
+                  Pelanggaran KTR
                 </div>
               </div>
               <p class="status-text" id="emissionText">
-                No smoke emissiones detected.
+                Tidak ada deteksi asap rokok.
               </p>
               <div class="button-group">
-                <button onclick="showEmissionHistory()">📋 View History</button>
+                <button onclick="showEmissionHistory()">📋 Lihat Riwayat</button>
                 <button
                   onclick="resetEmissionCount()"
                   style="
@@ -1198,14 +1198,14 @@
                     margin-top: 0;
                   "
                 >
-                  🔄 Reset
+                  🗑️ Hapus Riwayat
                 </button>
               </div>
             </div>
 
             <!-- Emission History Graph -->
             <div class="graph-container">
-              <h3>📈 Emission History Analysis</h3>
+              <h3>📈 Riwayat Pelanggaran KTR</h3>
               <div style="position: relative; width: 100%; height: 350px">
                 <canvas id="emissionChart" width="800" height="350"></canvas>
               </div>
@@ -1213,7 +1213,7 @@
 
             <!-- Emission History Log (positioned on the right of Emission Detection on wide screens) -->
             <div id="emissionHistory" style="display: none">
-              <h3>Detailed Emission Log</h3>
+              <h3>Detail Pelanggaran</h3>
               <ul id="emissionList" class="item-list"></ul>
               <button
                 onclick="closeEmissionHistory()"
@@ -1230,7 +1230,7 @@
     <!-- PAGE FOOTER -->
     <div class="page-footer">
       <h4>Kelompok 14</h4>
-      <p class="description">Dibuat untuk G-Reflex SMA Kolese Gonzaga: Smoke Detector Berbasis IoT</p>
+      <p class="description">Dibuat untuk G-Reflex SMA Kolese Gonzaga: Alat Pendeteksi Asap Rokok Berbasis IoT</p>
       <p class="names">Jovan Kusuma, Jocelyn Mathilda Tambunan, Kristoffer Anugerah Toga Lumbantobing</p>
       <p class="emails">37.jovan.kusuma@gonzaga.sch.id, 37.jocelyn.tambunan@gonzaga.sch.id, 37.kristoffer.lumbantobing@gonzaga.sch.id</p>
     </div>
@@ -1238,12 +1238,12 @@
     <!-- Smoke Detection Alert Modal -->
     <div id="alertOverlay" class="alert-overlay">
       <div class="alert-box">
-        <h2>🚨 Smoke Detected</h2>
+        <h2>🚨 Asap Rokok Terdeteksi</h2>
         <p>
-          Air quality has exceeded safe levels.<br />Please check for smoke or
-          fire immediately.
+          Asap Rokok terdeteksi oleh alat.<br/>
+          Silahkan lakukan pengecekan segera.
         </p>
-        <button onclick="acknowledgeAlert()">I Understand</button>
+        <button onclick="acknowledgeAlert()">Oke 👌</button>
       </div>
     </div>
 
@@ -1295,7 +1295,7 @@
             labels: getLastXDays(7),
             datasets: [
               {
-                label: "Smoke Emissions Per Day",
+                label: "Data Jumlah Pelanggar KTR per Hari",
                 data: getEmissionDataForDays(7),
                 backgroundColor: "#7b9e5e",
                 borderColor: "#6b8e4e",
@@ -1522,19 +1522,19 @@
             // Safe air quality
             el.style.color = "#7b9e5e";
             st.textContent =
-              "✓ Safe Zone - Air quality is good. Keep up good ventilation practices.";
+              "✅ Tidak ada asap rokok terdeteksi.";
             Updated = false;
           } else if (s <= 60) {
             // Moderate air quality
             el.style.color = "#c9a961";
             st.textContent =
-              "⚠️ Caution - Moderate smoke detected. Consider reducing smoking activities.";
+              "⚠️ Asap pada udara terdeteksi. Terdapat indikasi asap rokok";
             Updated = false;
           } else {
             // Poor/dangerous air quality
             el.style.color = "#d4543f";
             st.textContent =
-              "🚨 Alert - High smoke levels detected. Immediate action recommended.";
+              "🚨 Asap rokok terdeteksi. Lakukan Pengecekan Segera";
             if (!Updated) {
               // Record emission event with timestamp
               emissionCount++;
@@ -1560,7 +1560,7 @@
           document.getElementById("emissionText").textContent =
             emissionCount > 0
               ? `${emissionCount} smoke emission${emissionCount !== 1 ? "es" : ""} detected!`
-              : "No smoke emissiones detected.";
+              : "Tidak ada asap rokok terdeteksi.";
 
           // Update timestamp
           document.getElementById("time").textContent =
@@ -1622,12 +1622,12 @@
 
           document.getElementById("emission").textContent = "0";
           document.getElementById("emissionText").textContent =
-            "No smoke emissiones detected.";
+            "Tidak ada asap rokok terdeteksi.";
           document.getElementById("emissionList").innerHTML = "";
 
           updateEmissionChart();
 
-          showNotification("✓ Emission counter reset successfully", "success");
+          showNotification("✓ Data berhasil terhapus", "success");
         }
       }
 
@@ -1676,7 +1676,7 @@
         const toast = document.createElement("div");
         toast.className = "toast";
         toast.innerHTML = `
-          <strong>⚠️ Alert:</strong> Sudden spike in smoke detected. ${Math.round((prevScore || 0) + DEVIATION_LIMIT)}% increase in gas density.
+          <strong>⚠️ Peringatan!</strong> Kandungan asap rokok di udara meningkat drastis. Kepadatan asap meningkat ${Math.round((prevScore || 0) + DEVIATION_LIMIT)}%.
         `;
 
         document.body.appendChild(toast);

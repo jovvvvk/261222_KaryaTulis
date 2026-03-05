@@ -52,10 +52,7 @@ struct user_data {
 
 /** @brief Array of authorized users for WiFi access control */
 const user_data allowedUsers[] = {
-    { "Jovan",            "pass" },
-    { "Kelompok14_Guest", "guest123" },
-    { "p",              "getacc" },
-    { "UserX",          "abcX" }
+    { "Gonzaga", "12345"}
 };
 
 /**
@@ -85,7 +82,7 @@ const user_data allowedUsers[] = {
  * ```
  */
 class DeviceServer {
-    const char* ssid = "Kelompok 14 - Smoke Detector";        /**< WiFi SSID (network name) */
+    const char* ssid = "Kelompok 14 - Alat Pendeteksi Asap Rokok";        /**< WiFi SSID (network name) */
     const char* password = "kelompok14";  /**< WiFi password */
     WebServer server;                    /**< Web server instance */
     IPAddress IP;                        /**< Device IP address */
